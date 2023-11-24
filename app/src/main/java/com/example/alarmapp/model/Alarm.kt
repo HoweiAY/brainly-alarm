@@ -1,5 +1,6 @@
 package com.example.alarmapp.model
 
+import com.example.alarmapp.model.data.weekdays
 import java.util.Calendar
 import java.util.Locale
 
@@ -39,7 +40,7 @@ data class Alarm(
     }
 
     fun getDaysString(): String {
-        val weekdaysInOrder = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        val weekdaysInOrder = weekdays
         return when(days.distinct().size) {
             7 -> "Every day"
             else -> days.distinct().sortedBy { weekdaysInOrder.indexOf(it) }.joinToString()
