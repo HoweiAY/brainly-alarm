@@ -1,15 +1,13 @@
 package com.example.alarmapp.components.alarms
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +28,7 @@ fun AlarmCard(
     alarm: Alarm,
     modifier: Modifier = Modifier
 ) {
-    var checked by remember { mutableStateOf(true) }
+    var alarmEnabled by remember { mutableStateOf(true) }
     Card(
         modifier = modifier
     ) {
@@ -42,14 +40,16 @@ fun AlarmCard(
                 .padding(16.dp)
                 .height(64.dp)
         ) {
-            Text(text = alarm.getTimeString(), fontSize = 30.sp)
+            Column() {
+                Text(text = alarm.getTimeString(), fontSize = 30.sp)
+                Text(text = alarm.getDaysString(), fontSize = 12.sp, modifier = modifier.offset(2.dp))
+            }
             Switch(
-                checked = checked,
+                checked = alarmEnabled,
                 onCheckedChange = {
-                    checked = it
+                    alarmEnabled = it
                 }
             )
-
         }
     }
 }
