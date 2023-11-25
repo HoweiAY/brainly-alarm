@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Alarm app</string>
+    <string name="home_menu">Home menu</string>
+    <string name="create_alarm_menu">Create an alarm</string>
+
+    <string name="memory_game">Memory</string>
 </resources>

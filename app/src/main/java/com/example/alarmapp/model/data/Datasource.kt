@@ -14,7 +14,7 @@ val alarmData = listOf<Alarm>(
 val weekdays = listOf<String>("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 // list of task types
-val taskTypes = listOf<String>("Memory", "Maths", "QR code")
+val taskTypes = listOf<String>("Memory", "Math", "Scan code")
 
 //list of task difficulties
 val taskDifficulties = listOf<String>("Easy", "Normal", "Hard")
