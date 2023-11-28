@@ -39,7 +39,7 @@ private fun TileBoard(
     var flippingOrder by remember { mutableStateOf(emptyList<Int>()) }
     var currentPlayerIndex by remember { mutableStateOf(0) }
     var playerTurn by remember { mutableStateOf(false) }
-    val gridItems = remember { mutableStateListOf<TileState>().apply { repeat(9) { add(TileState.DEFAULT) } } }
+    val gridItems = remember { mutableStateListOf<TileState>().apply { repeat(gridSize * gridSize) { add(TileState.DEFAULT) } } }
 
     suspend fun start() {
         playerTurn = false
