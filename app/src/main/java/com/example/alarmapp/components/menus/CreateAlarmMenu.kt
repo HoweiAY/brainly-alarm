@@ -62,6 +62,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.alarmapp.model.data.taskDifficulties
 import com.example.alarmapp.model.data.taskTypes
 import com.example.alarmapp.model.data.weekdays
@@ -70,6 +72,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateAlarmMenu(
+    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     var taskSelectorExpanded by remember { mutableStateOf(false) }
@@ -343,7 +346,7 @@ fun CreateAlarmMenu(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            TextButton(onClick = { /*TODO*/ }) {
+            TextButton(onClick = { navController.popBackStack()}) {
                 Text(text = "Cancel", fontSize = 22.sp)
             }
             TextButton(onClick = { /*TODO*/ }) {
@@ -386,5 +389,5 @@ fun WeekdayTextButton(
 @Preview(showBackground = true)
 @Composable
 fun CreateAlarmMenuPreview() {
-    CreateAlarmMenu()
+    CreateAlarmMenu(navController = rememberNavController())
 }

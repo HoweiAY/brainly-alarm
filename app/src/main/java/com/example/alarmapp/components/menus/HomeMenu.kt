@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.alarmapp.components.alarms.AlarmCard
 import com.example.alarmapp.model.Alarm
 import com.example.alarmapp.model.data.alarmData
@@ -25,6 +27,7 @@ import com.example.alarmapp.model.data.alarmData
 @Composable
 fun HomeMenu(
     alarmData: List<Alarm>,
+    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -35,7 +38,7 @@ fun HomeMenu(
             modifier = modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(horizontal= 24.dp, vertical = 8.dp)
+                .padding(horizontal = 24.dp, vertical = 8.dp)
         ) {
             Text(text = "Alarms", fontSize = 24.sp)
         }
@@ -44,7 +47,7 @@ fun HomeMenu(
             contentPadding = PaddingValues(16.dp)
         ) {
             items(alarmData) {alarm ->
-                AlarmCard(alarm)
+                AlarmCard(alarm = alarm, navController = navController)
                 Spacer(modifier = Modifier.height(12.dp))
             }
         }
@@ -54,5 +57,5 @@ fun HomeMenu(
 @Preview(showBackground = true)
 @Composable
 fun HomeMenuPreview() {
-    HomeMenu(alarmData)
+    HomeMenu(alarmData, rememberNavController())
 }

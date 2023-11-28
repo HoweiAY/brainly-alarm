@@ -25,12 +25,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.alarmapp.AlarmScreen
 import com.example.alarmapp.model.Alarm
 import com.example.alarmapp.model.data.alarmData
 
 @Composable
 fun AlarmCard(
     alarm: Alarm,
+    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     var alarmEnabled by remember { mutableStateOf(true) }
@@ -40,7 +44,7 @@ fun AlarmCard(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(),
-                onClick = { }
+                onClick = { navController.navigate(AlarmScreen.CreateAlarm.name) }
             )
     ) {
         Row(
@@ -68,5 +72,5 @@ fun AlarmCard(
 @Preview
 @Composable
 fun AlarmCardPreview() {
-    AlarmCard(alarmData[0])
+    AlarmCard(alarmData[0], rememberNavController())
 }
