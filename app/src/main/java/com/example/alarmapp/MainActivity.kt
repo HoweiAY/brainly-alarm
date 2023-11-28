@@ -13,9 +13,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             //MemoryGame()
-            //AlarmClockApp()
             //PhoneShaking()
-            MathEquation(difficulty = Difficulty.EASY)
+            //MathEquation(difficulty = Difficulty.EASY)
+
+            AlarmClockApp()
         }
     }
 }

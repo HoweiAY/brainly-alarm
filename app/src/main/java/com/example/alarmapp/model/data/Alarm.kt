@@ -1,13 +1,29 @@
-package com.example.alarmapp.model
+package com.example.alarmapp.model.data
 
-import com.example.alarmapp.model.data.weekdays
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
+import com.example.alarmapp.components.missions.Difficulty
 import java.util.Calendar
 import java.util.Locale
 
+@Entity(tableName = "alarms")
+@TypeConverters(com.example.alarmapp.utils.TypeConverter::class)
 data class Alarm(
-    val days: List<String>,
-    val hour: Int,
-    val minute: Int
+    @PrimaryKey(autoGenerate = true)val id: Int,
+
+    @ColumnInfo(name = "days") val days: List<String>,
+    @ColumnInfo(name = "hour") val hour: Int,
+    @ColumnInfo(name = "minute") val minute: Int,
+
+    @ColumnInfo(name = "task") val task: String?,
+    @ColumnInfo(name = "task rounds") val rounds: Int?,
+    @ColumnInfo(name = "difficulty") val difficulty: String?,
+
+    @ColumnInfo(name = "sound") val sound: String?,
+    @ColumnInfo(name = "snooze") val snooze: Boolean?,
 ) {
     fun getTimeInMillis(): Long {
         val calendar = Calendar.getInstance()

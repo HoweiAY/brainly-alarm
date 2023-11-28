@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.alarmapp.AlarmScreen
-import com.example.alarmapp.model.Alarm
+import com.example.alarmapp.model.data.Alarm
 import com.example.alarmapp.model.data.alarmData
 
 @Composable
