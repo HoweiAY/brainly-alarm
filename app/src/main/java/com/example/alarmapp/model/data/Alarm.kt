@@ -12,18 +12,18 @@ import java.util.Locale
 @Entity(tableName = "alarms")
 @TypeConverters(com.example.alarmapp.utils.TypeConverter::class)
 data class Alarm(
-    @PrimaryKey(autoGenerate = true)val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
 
     @ColumnInfo(name = "days") val days: List<String>,
     @ColumnInfo(name = "hour") val hour: Int,
     @ColumnInfo(name = "minute") val minute: Int,
 
-    @ColumnInfo(name = "task") val task: String?,
-    @ColumnInfo(name = "task rounds") val rounds: Int?,
-    @ColumnInfo(name = "difficulty") val difficulty: String?,
+    @ColumnInfo(name = "task") val task: String = "Memory",
+    @ColumnInfo(name = "task rounds") val rounds: Int = 1,
+    @ColumnInfo(name = "difficulty") val difficulty: String = "Easy",
 
-    @ColumnInfo(name = "sound") val sound: String?,
-    @ColumnInfo(name = "snooze") val snooze: Boolean?,
+    @ColumnInfo(name = "sound") val sound: String = "Default",
+    @ColumnInfo(name = "snooze") val snooze: Boolean = true,
 ) {
     fun getTimeInMillis(): Long {
         val calendar = Calendar.getInstance()

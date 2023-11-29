@@ -1,12 +1,44 @@
 package com.example.alarmapp.model.data
 
-import kotlinx.coroutines.flow.Flow
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-interface AlarmRepository {
-    suspend fun insertAlarm(alarm: Alarm)
-    suspend fun updateAlarm(alarm: Alarm)
-    suspend fun deleteAlarm(alarm: Alarm)
+class AlarmRepository(private val alarmDao: AlarmDao) {
+    val allAlarms: LiveData<List<Alarm>> = alarmDao.getAllAlarms()
+    val foundAlarm = MutableLiveData<Alarm>()
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
-    fun getAllAlarms(): Flow<List<Alarm>>
-    fun getAlarmById(id: Int): Alarm
+    fun insertAlarm(alarm: Alarm) {
+        coroutineScope.launch(Dispatchers.IO) {
+            alarmDao.insert(alarm)
+        }
+    }
+
+    fun updateAlarm(alarm: Alarm) {
+        coroutineScope.launch(Dispatchers.IO) {
+            alarmDao.update(alarm)
+        }
+    }
+
+    fun deleteAlarm(alarm: Alarm) {
+        coroutineScope.launch(Dispatchers.IO) {
+            alarmDao.delete(alarm)
+        }
+    }
+
+    fun getAllAlarms() {
+        coroutineScope.launch(Dispatchers.IO) {
+            alarmDao.getAllAlarms()
+        }
+    }
+
+    fun getAlarmById(id: Int) {
+        coroutineScope.launch(Dispatchers.IO) {
+            foundAlarm.postValue(alarmDao.getAlarmById(id))
+        }
+    }
+
 }

@@ -60,14 +60,14 @@ fun AlarmCard(
                         homeViewModel.toggleAlarmSelected(alarm.id)
                         alarmSelected = homeUiState.selectedAlarms.contains(alarm.id)
                     } else {
-                        navController.navigate(AlarmScreen.CreateAlarm.name)
+                        navController.navigate("${AlarmScreen.CreateAlarm.name}/${alarm.id}")
                     }
-                          },
+                },
                 onLongClick = {
                     homeViewModel.toggleAlarmSelected(alarm.id)
                     alarmSelected = homeUiState.selectedAlarms.contains(alarm.id)
                     homeViewModel.enableEdit()
-                     },
+                },
             )
     ) {
         Row(

@@ -17,6 +17,7 @@ abstract class AlarmDatabase: RoomDatabase() {
         fun getAlarmDatabase(context: Context): AlarmDatabase {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, AlarmDatabase::class.java, "alarm_database")
+                    .fallbackToDestructiveMigration()
                     .build()
                     .also { Instance = it }
             }

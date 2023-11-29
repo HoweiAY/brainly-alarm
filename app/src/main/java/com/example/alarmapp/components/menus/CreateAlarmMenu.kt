@@ -1,10 +1,5 @@
 package com.example.alarmapp.components.menus
 
-import androidx.annotation.StringRes
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,9 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -26,18 +19,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedAssistChip
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -56,23 +44,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.alarmapp.model.data.taskDifficulties
 import com.example.alarmapp.model.data.taskTypes
 import com.example.alarmapp.model.data.weekdays
+import com.example.alarmapp.viewmodels.AlarmDatabaseViewModel
+import com.example.alarmapp.viewmodels.CreateAlarmViewModel
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateAlarmMenu(
+    alarmId: Int? = null,
     navController: NavHostController,
+    alarmDatabaseViewModel: AlarmDatabaseViewModel,
+    createAlarmViewModel: CreateAlarmViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
     var taskSelectorExpanded by remember { mutableStateOf(false) }
@@ -234,12 +227,16 @@ fun CreateAlarmMenu(
                                 Text(text = "1")
                                 Slider(
                                     modifier = modifier.width(170.dp),
-                                    enabled = taskSelected != taskTypes[2],
+                                    enabled = taskTypes
+                                        .slice(2 until taskTypes.size)
+                                        .any { it != taskSelected },
                                     value = roundCount,
                                     onValueChange = { roundCount = it },
                                     steps = 3,
                                     valueRange = 1f..5f,
-                                    onValueChangeFinished = { roundsSelected = roundCount.roundToInt() }
+                                    onValueChangeFinished = {
+                                        roundsSelected = roundCount.roundToInt()
+                                    }
                                 )
                                 Text(text = "5")
                             }
@@ -269,7 +266,10 @@ fun CreateAlarmMenu(
                                 ) {
                                     RadioButton(
                                         selected = difficulty == difficultySelected,
-                                        onClick = { difficultySelected = difficulty }
+                                        onClick = { difficultySelected = difficulty },
+                                        enabled = taskTypes
+                                            .slice(2 until taskTypes.size)
+                                            .any { it != taskSelected }
                                     )
                                     Text(text = difficulty)
                                 }
@@ -386,8 +386,10 @@ fun WeekdayTextButton(
 
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun CreateAlarmMenuPreview() {
     CreateAlarmMenu(navController = rememberNavController())
 }
+*/

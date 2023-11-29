@@ -18,13 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.alarmapp.components.games.MemoryGame
 import com.example.alarmapp.components.menus.CreateAlarmMenu
 import com.example.alarmapp.components.menus.HomeMenu
 import com.example.alarmapp.model.data.alarmData
+import com.example.alarmapp.viewmodels.AlarmDatabaseViewModel
 
 enum class AlarmScreen(@StringRes val title: Int) {
     Home(title = R.string.home_menu),
@@ -38,6 +41,7 @@ enum class TasksScreen(@StringRes val title: Int) {
 @Composable
 fun AlarmClockApp(
     navController: NavHostController = rememberNavController(),
+    alarmDatabaseViewModel: AlarmDatabaseViewModel,
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
 
@@ -50,13 +54,14 @@ fun AlarmClockApp(
     ) {
         composable(route = AlarmScreen.Home.name) {
             HomeMenu(
-                alarmData = alarmData,
+                alarmDatabaseViewModel = alarmDatabaseViewModel,
                 navController = navController,
             )
         }
 
         composable(
-            route = AlarmScreen.CreateAlarm.name,
+            route = "${AlarmScreen.CreateAlarm.name}/{alarmId}",
+            arguments = listOf(navArgument("alarmId") { type = NavType.IntType }),
             enterTransition = { slideInHorizontally(
                 animationSpec = tween(300)
             ) + fadeIn(
@@ -71,8 +76,12 @@ fun AlarmClockApp(
                     300, easing = LinearEasing
                 )
             ) },
-        ) {
-            CreateAlarmMenu(navController = navController)
+        ) {backStackEntry ->
+            CreateAlarmMenu(
+                alarmId = backStackEntry.arguments?.getInt("alarmId"),
+                alarmDatabaseViewModel = alarmDatabaseViewModel,
+                navController = navController,
+            )
         }
 
         composable(route = TasksScreen.MemoryGame.name) {

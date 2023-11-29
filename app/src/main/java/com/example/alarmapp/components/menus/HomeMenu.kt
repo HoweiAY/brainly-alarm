@@ -28,6 +28,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -47,16 +49,18 @@ import com.example.alarmapp.AlarmScreen
 import com.example.alarmapp.components.alarms.AlarmCard
 import com.example.alarmapp.model.data.Alarm
 import com.example.alarmapp.model.data.alarmData
+import com.example.alarmapp.viewmodels.AlarmDatabaseViewModel
 import com.example.alarmapp.viewmodels.HomeViewModel
 
 @Composable
 fun HomeMenu(
-    alarmData: List<Alarm>,
+    alarmDatabaseViewModel: AlarmDatabaseViewModel,
     navController: NavHostController,
     homeViewModel: HomeViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
     val homeUiState by homeViewModel.uiState.collectAsState()
+    val alarmData by alarmDatabaseViewModel.allAlarms.observeAsState(listOf())
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -108,7 +112,11 @@ fun HomeMenu(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             IconButton(
-                                onClick = { navController.navigate(AlarmScreen.CreateAlarm.name) }
+                                onClick = {
+                                    alarmDatabaseViewModel.insertAlarm(
+                                        Alarm(days = listOf("Mon"), hour = 8, minute = 0)
+                                    )
+                                }
                             ) {
                                 Icon(
                                     Icons.Default.Add,
@@ -143,7 +151,7 @@ fun HomeMenu(
                             }
                         }
                     else
-                        IconButton(onClick = { /*TODO*/ }) {
+                        IconButton(onClick = { alarmDatabaseViewModel.deleteAlarm(alarmData[0]) }) {
                             Icon(
                                 Icons.Default.Delete,
                                 contentDescription = "Delete alarm"
@@ -185,8 +193,10 @@ fun HomeMenu(
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun HomeMenuPreview() {
     HomeMenu(alarmData, rememberNavController())
 }
+*/
