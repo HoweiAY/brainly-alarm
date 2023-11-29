@@ -1,5 +1,7 @@
 package com.example.alarmapp.components.menus
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,6 +64,9 @@ fun HomeMenu(
 ) {
     val homeUiState by homeViewModel.uiState.collectAsState()
     val alarmData by alarmDatabaseViewModel.allAlarms.observeAsState(listOf())
+    val alarmSelected by alarmDatabaseViewModel.foundAlarm.observeAsState()
+
+    val testAlarm = com.example.alarmapp.model.data.alarmData[1]
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -105,7 +111,6 @@ fun HomeMenu(
                         .padding(start = 24.dp, end = 8.dp)
                 ) {
                     Text(text = "Alarms", fontSize = 24.sp)
-
                     if (!homeUiState.alarmEditEnabled)
                         Row(
                             horizontalArrangement = Arrangement.End,
@@ -114,7 +119,7 @@ fun HomeMenu(
                             IconButton(
                                 onClick = {
                                     alarmDatabaseViewModel.insertAlarm(
-                                        Alarm(days = listOf("Mon"), hour = 8, minute = 0)
+                                        testAlarm
                                     )
                                 }
                             ) {
@@ -151,7 +156,16 @@ fun HomeMenu(
                             }
                         }
                     else
-                        IconButton(onClick = { alarmDatabaseViewModel.deleteAlarm(alarmData[0]) }) {
+                        IconButton(
+                            onClick = {
+                                if (homeUiState.selectedAlarms.isNotEmpty()) {
+                                    homeUiState.selectedAlarms.forEach {
+                                        alarmDatabaseViewModel.deleteAlarm(it)
+                                    }
+                                    homeViewModel.cancelAlarmsEdit()
+                                }
+                            }
+                        ) {
                             Icon(
                                 Icons.Default.Delete,
                                 contentDescription = "Delete alarm"
@@ -167,6 +181,7 @@ fun HomeMenu(
                         AlarmCard(
                             alarm = alarm,
                             navController = navController,
+                            alarmDatabaseViewModel = alarmDatabaseViewModel,
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                     }

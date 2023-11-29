@@ -35,6 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.alarmapp.AlarmScreen
 import com.example.alarmapp.model.data.Alarm
 import com.example.alarmapp.model.data.alarmData
+import com.example.alarmapp.viewmodels.AlarmDatabaseViewModel
 import com.example.alarmapp.viewmodels.HomeViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -42,6 +43,7 @@ import com.example.alarmapp.viewmodels.HomeViewModel
 fun AlarmCard(
     alarm: Alarm,
     navController: NavHostController,
+    alarmDatabaseViewModel: AlarmDatabaseViewModel,
     homeViewModel: HomeViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -57,15 +59,15 @@ fun AlarmCard(
                 indication = rememberRipple(),
                 onClick = {
                     if (homeUiState.alarmEditEnabled) {
-                        homeViewModel.toggleAlarmSelected(alarm.id)
-                        alarmSelected = homeUiState.selectedAlarms.contains(alarm.id)
+                        homeViewModel.toggleAlarmSelected(alarm)
+                        alarmSelected = homeUiState.selectedAlarms.contains(alarm)
                     } else {
                         navController.navigate("${AlarmScreen.CreateAlarm.name}/${alarm.id}")
                     }
                 },
                 onLongClick = {
-                    homeViewModel.toggleAlarmSelected(alarm.id)
-                    alarmSelected = homeUiState.selectedAlarms.contains(alarm.id)
+                    homeViewModel.toggleAlarmSelected(alarm)
+                    alarmSelected = homeUiState.selectedAlarms.contains(alarm)
                     homeViewModel.enableEdit()
                 },
             )
@@ -104,16 +106,18 @@ fun AlarmCard(
                 Checkbox(
                     checked = alarmSelected,
                     onCheckedChange = {
-                        homeViewModel.toggleAlarmSelected(alarm.id)
-                        alarmSelected = homeUiState.selectedAlarms.contains(alarm.id)
+                        homeViewModel.toggleAlarmSelected(alarm)
+                        alarmSelected = homeUiState.selectedAlarms.contains(alarm)
                     }
                 )
         }
     }
 }
 
+/*
 @Preview
 @Composable
 fun AlarmCardPreview() {
     AlarmCard(alarmData[0], rememberNavController())
 }
+*/

@@ -1,13 +1,5 @@
 package com.example.alarmapp.model.data
 
-// list of Alarm objects
-val alarmData = listOf<Alarm>(
-    Alarm(0, listOf("Mon"), 8, 0),
-    Alarm(1, listOf("Sun", "Fri", "Wed"), 9, 15),
-    Alarm(2, listOf("Sat"), 6, 40),
-    Alarm(3, listOf("Mon", "Wed", "Sun", "Thu", "Tue", "Sat", "Fri"), 11, 25),
-    )
-
 // list of week day Strings
 val weekdays = listOf<String>("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
@@ -16,3 +8,13 @@ val taskTypes = listOf<String>("Memory", "Math", "Shake phone", "Scan code", "No
 
 //list of task difficulties
 val taskDifficulties = listOf<String>("Easy", "Normal", "Hard")
+
+// list of Alarm objects
+val alarmData = listOf<Alarm>(
+    Alarm(days = listOf("Mon"), hour = 8, minute = 0, task = "Memory"),
+    Alarm(days = listOf("Sun", "Fri", "Wed"), hour = 9, minute = 15, task = "Math", rounds = 3, difficulty = "Hard"),
+    Alarm(days = listOf("Sat"), hour = 6, minute = 40),
+    Alarm(days = listOf("Mon", "Wed", "Sun", "Thu", "Tue", "Sat", "Fri"), hour = 11, minute = 25),
+    )
+
+

@@ -1,5 +1,6 @@
 package com.example.alarmapp.components.menus
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,7 +36,9 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.alarmapp.model.data.Alarm
 import com.example.alarmapp.model.data.taskDifficulties
 import com.example.alarmapp.model.data.taskTypes
 import com.example.alarmapp.model.data.weekdays
@@ -68,14 +72,33 @@ fun CreateAlarmMenu(
     createAlarmViewModel: CreateAlarmViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-    var taskSelectorExpanded by remember { mutableStateOf(false) }
+    val createAlarmUiState by createAlarmViewModel.uiState.collectAsState()
+    var alarmLoaded by remember { mutableStateOf(false) }
+    var alarm by remember(alarmId) {
+        mutableStateOf<Alarm?>(null)
+    }
 
-    var weekdaysSelected by remember { mutableStateOf(mutableListOf<String>()) }
-    var taskSelected by remember { mutableStateOf(taskTypes[0]) }
-    var roundsSelected by remember { mutableStateOf(1) }
-    var difficultySelected by remember { mutableStateOf(taskDifficulties[0]) }
-    var alarmSoundSelected by remember { mutableStateOf("Default") }
-    var snoozeEnabled by remember { mutableStateOf(true) }
+    Log.i("debug create alarm: ", "initial alarmId: ${alarmId?: "null"}")
+
+    if (alarmId != null && !alarmLoaded) alarmDatabaseViewModel.getAlarmById(alarmId)
+    alarmDatabaseViewModel.foundAlarm.observeAsState().value?.let { foundAlarm ->
+        alarm = foundAlarm
+    }
+    Log.i("debug foundAlarm: ", "foundAlarm: id - ${alarm?.id?: "no id found"}")
+    Log.i("debug foundAlarm: ", "foundAlarm: task - ${alarm?.task?: "Nope"}")
+
+    if (alarm != null && !alarmLoaded) {
+        if (alarmId == alarm!!.id) alarmLoaded = true
+        createAlarmViewModel.resetUiState(alarm)
+    }
+
+    val timePickerState = rememberTimePickerState(
+        initialHour = createAlarmUiState.hourSelected,
+        initialMinute = createAlarmUiState.minuteSelected,
+        is24Hour = false
+    )
+
+    if (alarmLoaded) {
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -87,8 +110,6 @@ fun CreateAlarmMenu(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val timePickerState = rememberTimePickerState(is24Hour = false)
-
             Spacer(modifier = Modifier.height(20.dp))
             Row(
                 horizontalArrangement = Arrangement.Start,
@@ -98,7 +119,7 @@ fun CreateAlarmMenu(
                     .wrapContentHeight()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Text(text = "Set an alarm", fontSize = 30.sp)
+                Text(text = "Set an alarm ${alarm?.id}", fontSize = 30.sp)
             }
             Spacer(modifier = Modifier.height(20.dp))
             TimePicker(state = timePickerState, modifier = modifier)
@@ -139,13 +160,13 @@ fun CreateAlarmMenu(
                                 items(weekdays) { weekday ->
                                     WeekdayTextButton(
                                         weekday = weekday,
-                                        isSelected = weekdaysSelected.contains(weekday),
+                                        isSelected = createAlarmUiState
+                                            .weekdaysSelected
+                                            .contains(weekday),
                                         onClick = {
-                                            if (weekdaysSelected.contains(weekday)) {
-                                                weekdaysSelected.remove(weekday)
-                                            } else {
-                                                weekdaysSelected.add(weekday)
-                                            }
+                                            createAlarmViewModel.updateWeekdays(weekday)
+                                            Log.i("debug select days: ", createAlarmUiState.weekdaysSelected.toString())
+                                            Log.i("debug select days: ", createAlarmUiState.weekdaysSelected.contains(weekday).toString())
                                         }
                                     )
                                 }
@@ -171,27 +192,33 @@ fun CreateAlarmMenu(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.End
                             ) {
-                                Text(text = taskSelected, fontSize = 16.sp)
+                                Text(text = createAlarmUiState.taskSelected, fontSize = 16.sp)
                                 Box(
                                     modifier = modifier
                                         .wrapContentSize(Alignment.CenterEnd)
                                 ) {
-                                    IconButton(onClick = { taskSelectorExpanded = true }) {
+                                    IconButton(
+                                        onClick = {
+                                            createAlarmViewModel.expandTaskSelector(true)
+                                        }
+                                    ) {
                                         Icon(
                                             Icons.Default.ArrowDropDown,
                                             contentDescription = "Task selection options"
                                         )
                                     }
                                     DropdownMenu(
-                                        expanded = taskSelectorExpanded,
-                                        onDismissRequest = { taskSelectorExpanded = false }
+                                        expanded = createAlarmUiState.taskSelectorExpanded,
+                                        onDismissRequest = {
+                                            createAlarmViewModel.expandTaskSelector(false)
+                                        }
                                     ) {
                                         taskTypes.forEach { taskType ->
                                             DropdownMenuItem(
                                                 text = { Text(taskType) },
                                                 onClick = {
-                                                    taskSelected = taskType
-                                                    taskSelectorExpanded = false
+                                                    createAlarmViewModel.updateTaskSelected(taskType)
+                                                    createAlarmViewModel.expandTaskSelector(false)
                                                 }
                                             )
                                         }
@@ -210,7 +237,9 @@ fun CreateAlarmMenu(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            var roundCount by remember { mutableFloatStateOf(1f) }
+                            var roundCount by remember {
+                                mutableFloatStateOf(createAlarmUiState.roundsSelected.toFloat())
+                            }
                             Text(
                                 text = "No. of Rounds",
                                 fontSize = 16.sp,
@@ -229,13 +258,13 @@ fun CreateAlarmMenu(
                                     modifier = modifier.width(170.dp),
                                     enabled = taskTypes
                                         .slice(2 until taskTypes.size)
-                                        .any { it != taskSelected },
+                                        .any { it != createAlarmUiState.taskSelected },
                                     value = roundCount,
                                     onValueChange = { roundCount = it },
                                     steps = 3,
                                     valueRange = 1f..5f,
                                     onValueChangeFinished = {
-                                        roundsSelected = roundCount.roundToInt()
+                                        createAlarmViewModel.updateRoundCount(roundCount.roundToInt())
                                     }
                                 )
                                 Text(text = "5")
@@ -265,11 +294,11 @@ fun CreateAlarmMenu(
                                     horizontalArrangement = Arrangement.SpaceEvenly
                                 ) {
                                     RadioButton(
-                                        selected = difficulty == difficultySelected,
-                                        onClick = { difficultySelected = difficulty },
+                                        selected = difficulty == createAlarmUiState.difficultySelected,
+                                        onClick = { createAlarmViewModel.updateTaskDifficulty(difficulty) },
                                         enabled = taskTypes
                                             .slice(2 until taskTypes.size)
-                                            .any { it != taskSelected }
+                                            .any { it != createAlarmUiState.taskSelected }
                                     )
                                     Text(text = difficulty)
                                 }
@@ -298,7 +327,7 @@ fun CreateAlarmMenu(
                                 )
                                 Box(modifier = modifier.padding(start = 4.dp)) {
                                     Text(
-                                        text = alarmSoundSelected,
+                                        text = createAlarmUiState.alarmSoundSelected,
                                         fontSize = 14.sp,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
@@ -330,8 +359,10 @@ fun CreateAlarmMenu(
                                 modifier = modifier
                             )
                             Switch(
-                                checked = snoozeEnabled,
-                                onCheckedChange = { snoozeEnabled = !snoozeEnabled }
+                                checked = createAlarmUiState.snoozeEnabled,
+                                onCheckedChange = {
+                                    createAlarmViewModel.updateSnoozeEnabled(!createAlarmUiState.snoozeEnabled)
+                                }
                             )
                         }
                     }
@@ -353,6 +384,8 @@ fun CreateAlarmMenu(
                 Text(text = "Confirm", fontSize = 22.sp)
             }
         }
+    }
+
     }
 }
 

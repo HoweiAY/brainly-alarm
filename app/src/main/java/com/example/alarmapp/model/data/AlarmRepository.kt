@@ -1,14 +1,17 @@
 package com.example.alarmapp.model.data
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class AlarmRepository(private val alarmDao: AlarmDao) {
     val allAlarms: LiveData<List<Alarm>> = alarmDao.getAllAlarms()
-    val foundAlarm = MutableLiveData<Alarm>()
+    val foundAlarm = MutableLiveData<Alarm?>()
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     fun insertAlarm(alarm: Alarm) {
@@ -35,10 +38,9 @@ class AlarmRepository(private val alarmDao: AlarmDao) {
         }
     }
 
-    fun getAlarmById(id: Int) {
-        coroutineScope.launch(Dispatchers.IO) {
-            foundAlarm.postValue(alarmDao.getAlarmById(id))
-        }
+    suspend fun getAlarmById(id: Int): Alarm? {
+        return coroutineScope.async(Dispatchers.IO) {
+            alarmDao.getAlarmById(id)
+        }.await()
     }
-
 }

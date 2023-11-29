@@ -1,7 +1,9 @@
 package com.example.alarmapp.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.lifecycle.ViewModel
+import com.example.alarmapp.model.data.Alarm
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +22,7 @@ class HomeViewModel: ViewModel() {
             currentState.copy(
                 optionsExpanded = false,
                 alarmEditEnabled = false,
-                selectedAlarms = mutableListOf<Int>()
+                selectedAlarms = mutableListOf<Alarm>()
             )
         }
     }
@@ -44,12 +46,22 @@ class HomeViewModel: ViewModel() {
         }
     }
 
-    fun toggleAlarmSelected(alarmId: Int) {
+    fun toggleAlarmSelected(alarm: Alarm) {
         val alarmsSelected = _uiState.value.selectedAlarms
         _uiState.update {currentState ->
-            if (alarmsSelected.contains(alarmId)) alarmsSelected.remove(alarmId)
-            else alarmsSelected.add(alarmId)
+            if (alarmsSelected.contains(alarm)) {
+                alarmsSelected.remove(alarm)
+            }
+            else {
+                alarmsSelected.add(alarm)
+            }
             currentState.copy(selectedAlarms = alarmsSelected)
+        }
+    }
+
+    fun clearSelectedAlarm() {
+        _uiState.update {currentState ->
+            currentState.copy(selectedAlarms = mutableListOf<Alarm>())
         }
     }
 
