@@ -14,18 +14,18 @@ import java.util.Locale
 data class Alarm(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
 
-    @ColumnInfo(name = "days") val days: List<String> = listOf<String>(),
-    @ColumnInfo(name = "hour") val hour: Int = 12,
-    @ColumnInfo(name = "minute") val minute: Int = 0,
+    @ColumnInfo(name = "days") var days: List<String> = listOf<String>(),
+    @ColumnInfo(name = "hour") var hour: Int = 12,
+    @ColumnInfo(name = "minute") var minute: Int = 0,
 
-    @ColumnInfo(name = "task") val task: String = "Memory",
-    @ColumnInfo(name = "task rounds") val rounds: Int = 1,
-    @ColumnInfo(name = "difficulty") val difficulty: String = "Easy",
+    @ColumnInfo(name = "task") var task: String = "Memory",
+    @ColumnInfo(name = "task rounds") var rounds: Int = 1,
+    @ColumnInfo(name = "difficulty") var difficulty: String = "Easy",
 
-    @ColumnInfo(name = "sound") val sound: String = "Default",
-    @ColumnInfo(name = "snooze") val snooze: Boolean = true,
+    @ColumnInfo(name = "sound") var sound: String = "Default",
+    @ColumnInfo(name = "snooze") var snooze: Boolean = true,
 
-    @ColumnInfo(name = "enabled") val enabled: Boolean = true,
+    @ColumnInfo(name = "enabled") var enabled: Boolean = true,
 ) {
     fun getTimeInMillis(): Long {
         val calendar = Calendar.getInstance()

@@ -8,6 +8,7 @@ import com.example.alarmapp.components.missions.Difficulty
 import com.example.alarmapp.model.data.Alarm
 import com.example.alarmapp.model.data.AlarmDatabase
 import com.example.alarmapp.model.data.AlarmRepository
+import com.example.alarmapp.model.data.taskDifficulties
 import com.example.alarmapp.model.data.taskTypes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,23 +23,38 @@ class CreateAlarmViewModel(): ViewModel() {
     fun resetUiState(alarm: Alarm? = null) {
         if (alarm != null) {
             _uiState.update { currentState ->
-                currentState.copy(
-                    weekdaysSelected = alarm.days.toMutableList(),
-                    hourSelected = alarm.hour,
-                    minuteSelected = alarm.minute,
-                    taskSelected = alarm.task,
-                    roundsSelected = alarm.rounds,
-                    difficultySelected = alarm.difficulty,
-                    alarmSoundSelected = alarm.sound,
-                    snoozeEnabled = alarm.snooze
-                )
+                if (alarm != null) {
+                    currentState.copy(
+                        alarmId = alarm.id,
+                        weekdaysSelected = alarm.days.toMutableList(),
+                        hourSelected = alarm.hour,
+                        minuteSelected = alarm.minute,
+                        taskSelected = alarm.task,
+                        roundsSelected = alarm.rounds,
+                        difficultySelected = alarm.difficulty,
+                        alarmSoundSelected = alarm.sound,
+                        snoozeEnabled = alarm.snooze
+                    )
+                } else {
+                    currentState.copy(
+                        alarmId = null,
+                        weekdaysSelected = mutableListOf<String>(),
+                        hourSelected = 8,
+                        minuteSelected = 0,
+                        taskSelected = taskTypes[0],
+                        roundsSelected = 1,
+                        difficultySelected = taskDifficulties[0],
+                        alarmSoundSelected = "Default",
+                        snoozeEnabled = true
+                    )
+                }
             }
         }
         val days = if (alarm != null) _uiState.value.weekdaysSelected.toString() else "Days: Nothing"
         val task = if (alarm != null) _uiState.value.taskSelected else "Task: Nothing"
         Log.i("debug create alarm resetUiState: ", "Create alarm UI state reset")
-        Log.i("debug create alarm resetUiState: ", days)
-        Log.i("debug create alarm resetUiState: ", task)
+        Log.i("debug create alarm resetUiState: ", "days: $days")
+        Log.i("debug create alarm resetUiState: ", "task: $task")
     }
 
     fun expandTaskSelector(expand: Boolean = false) {

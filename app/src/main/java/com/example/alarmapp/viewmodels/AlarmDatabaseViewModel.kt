@@ -29,15 +29,17 @@ class AlarmDatabaseViewModel(application: Application): ViewModel() {
 
     fun insertAlarm(alarm: Alarm) {
         alarmRepository.insertAlarm(alarm)
+        Log.i("debug insertAlarm viewModel: ", "Inserting alarm with ID ${alarm.id}")
     }
 
     fun updateAlarm(alarm: Alarm) {
         alarmRepository.updateAlarm(alarm)
+        Log.i("debug updateAlarm viewModel: ", "Updating alarm with ID ${alarm.id}")
     }
 
     fun deleteAlarm(alarm: Alarm) {
         alarmRepository.deleteAlarm(alarm)
-        Log.i("debug deleteAlarm: ", "Deleting alarm with ID ${alarm.id}")
+        Log.i("debug deleteAlarm viewModel: ", "Deleting alarm with ID ${alarm.id}")
     }
 
     fun getAllAlarms() {

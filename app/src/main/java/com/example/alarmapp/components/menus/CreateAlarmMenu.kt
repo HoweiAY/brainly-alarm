@@ -66,7 +66,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateAlarmMenu(
-    alarmId: Int? = null,
+    alarmId: String? = null,
     navController: NavHostController,
     alarmDatabaseViewModel: AlarmDatabaseViewModel,
     createAlarmViewModel: CreateAlarmViewModel = viewModel(),
@@ -78,27 +78,34 @@ fun CreateAlarmMenu(
         mutableStateOf<Alarm?>(null)
     }
 
-    Log.i("debug create alarm: ", "initial alarmId: ${alarmId?: "null"}")
-
-    if (alarmId != null && !alarmLoaded) alarmDatabaseViewModel.getAlarmById(alarmId)
-    alarmDatabaseViewModel.foundAlarm.observeAsState().value?.let { foundAlarm ->
-        alarm = foundAlarm
+    LaunchedEffect(true) {
+        alarmLoaded = false
+        createAlarmViewModel.resetUiState(null)
     }
-    Log.i("debug foundAlarm: ", "foundAlarm: id - ${alarm?.id?: "no id found"}")
-    Log.i("debug foundAlarm: ", "foundAlarm: task - ${alarm?.task?: "Nope"}")
+
+    if (alarmId == null) alarmLoaded = true
+
+    if (alarmId != null && !alarmLoaded) {
+        alarmDatabaseViewModel.getAlarmById(alarmId.toInt())
+        alarmDatabaseViewModel.foundAlarm.observeAsState().value?.let { foundAlarm ->
+            alarm = foundAlarm
+        }
+    }
 
     if (alarm != null && !alarmLoaded) {
-        if (alarmId == alarm!!.id) alarmLoaded = true
+        if (alarmId?.toInt() == alarm!!.id) alarmLoaded = true
         createAlarmViewModel.resetUiState(alarm)
     }
 
-    val timePickerState = rememberTimePickerState(
-        initialHour = createAlarmUiState.hourSelected,
-        initialMinute = createAlarmUiState.minuteSelected,
-        is24Hour = false
-    )
+
 
     if (alarmLoaded) {
+
+        val timePickerState = rememberTimePickerState(
+            initialHour = alarm?.hour?: createAlarmUiState.hourSelected,
+            initialMinute = alarm?.minute?: createAlarmUiState.minuteSelected,
+            is24Hour = false
+        )
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -237,9 +244,6 @@ fun CreateAlarmMenu(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            var roundCount by remember {
-                                mutableFloatStateOf(createAlarmUiState.roundsSelected.toFloat())
-                            }
                             Text(
                                 text = "No. of Rounds",
                                 fontSize = 16.sp,
@@ -259,13 +263,10 @@ fun CreateAlarmMenu(
                                     enabled = taskTypes
                                         .slice(2 until taskTypes.size)
                                         .any { it != createAlarmUiState.taskSelected },
-                                    value = roundCount,
-                                    onValueChange = { roundCount = it },
+                                    value = createAlarmUiState.roundsSelected.toFloat(),
+                                    onValueChange = { createAlarmViewModel.updateRoundCount(it.toInt()) },
                                     steps = 3,
                                     valueRange = 1f..5f,
-                                    onValueChangeFinished = {
-                                        createAlarmViewModel.updateRoundCount(roundCount.roundToInt())
-                                    }
                                 )
                                 Text(text = "5")
                             }
@@ -296,9 +297,8 @@ fun CreateAlarmMenu(
                                     RadioButton(
                                         selected = difficulty == createAlarmUiState.difficultySelected,
                                         onClick = { createAlarmViewModel.updateTaskDifficulty(difficulty) },
-                                        enabled = taskTypes
-                                            .slice(2 until taskTypes.size)
-                                            .any { it != createAlarmUiState.taskSelected }
+                                        enabled = createAlarmUiState.difficultySelected == taskTypes[0] ||
+                                                createAlarmUiState.difficultySelected != taskTypes[1]
                                     )
                                     Text(text = difficulty)
                                 }
@@ -377,11 +377,51 @@ fun CreateAlarmMenu(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            TextButton(onClick = { navController.popBackStack()}) {
-                Text(text = "Cancel", fontSize = 22.sp)
+            TextButton(
+                onClick = {
+                    createAlarmViewModel.resetUiState(null)
+                    navController.popBackStack()
+                }
+            ) {
+                Text(text = "Cancel", fontSize = 20.sp)
             }
-            TextButton(onClick = { /*TODO*/ }) {
-                Text(text = "Confirm", fontSize = 22.sp)
+            TextButton(
+                onClick = {
+                    var id = -1
+                    if (alarm != null) {
+                        alarm!!.days = createAlarmUiState.weekdaysSelected
+                        alarm!!.hour = timePickerState.hour
+                        alarm!!.minute = timePickerState.minute
+                        alarm!!.task = createAlarmUiState.taskSelected
+                        alarm!!.difficulty = createAlarmUiState.difficultySelected
+                        alarm!!.rounds = createAlarmUiState.roundsSelected
+                        alarm!!.sound = createAlarmUiState.alarmSoundSelected
+                        alarm!!.snooze = createAlarmUiState.snoozeEnabled
+                        alarm!!.enabled = true
+                        alarmDatabaseViewModel.updateAlarm(alarm!!)
+                        id = alarm!!.id
+                        alarm = null
+                    } else {
+                        val createAlarm = Alarm(
+                            days = createAlarmUiState.weekdaysSelected,
+                            hour = timePickerState.hour,
+                            minute = timePickerState.minute,
+                            task = createAlarmUiState.taskSelected,
+                            difficulty = createAlarmUiState.difficultySelected,
+                            rounds = createAlarmUiState.roundsSelected,
+                            sound = createAlarmUiState.alarmSoundSelected,
+                            snooze = createAlarmUiState.snoozeEnabled,
+                            enabled = true,
+                        )
+                        alarmDatabaseViewModel.insertAlarm(createAlarm)
+                        id = createAlarm.id
+                    }
+                    createAlarmViewModel.resetUiState(null)
+                    Log.i("debug create alarm save:", "saving alarm id: $id")
+                    navController.popBackStack()
+                }
+            ) {
+                Text(text = "Confirm", fontSize = 20.sp)
             }
         }
     }
@@ -396,25 +436,28 @@ fun WeekdayTextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isSelected by remember { mutableStateOf(isSelected) }
     var textColor by remember { mutableStateOf(Color.Unspecified) }
     var buttonColor by remember { mutableStateOf(Color.Transparent) }
+    var daySelected by remember { mutableStateOf(false) }
 
     TextButton(
         colors = ButtonDefaults.buttonColors(containerColor = buttonColor, contentColor = textColor),
         onClick = {
             onClick()
-            isSelected = !isSelected
-            buttonColor = if (isSelected) Color.LightGray else Color.Transparent
-            textColor = if (isSelected) Color.Red else Color.Unspecified
+            daySelected = !daySelected
+            Log.i("debug weekday button:", "$weekday selected: $daySelected")
+            buttonColor = if (daySelected) Color.LightGray else Color.Transparent
+            textColor = if (daySelected) Color.Red else Color.Unspecified
         }
     ) {
         Text(text = weekday, fontSize = 12.sp)
     }
 
     LaunchedEffect(isSelected) {
+        daySelected = false
         buttonColor = if (isSelected) Color.LightGray else Color.Transparent
         textColor = if (isSelected) Color.Red else Color.Unspecified
+        daySelected = isSelected
     }
 
 }

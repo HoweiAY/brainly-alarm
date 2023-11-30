@@ -1,7 +1,5 @@
 package com.example.alarmapp.viewmodels
 
-import android.util.Log
-import androidx.compose.runtime.currentRecomposeScope
 import androidx.lifecycle.ViewModel
 import com.example.alarmapp.model.data.Alarm
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,6 +44,29 @@ class HomeViewModel: ViewModel() {
         }
     }
 
+    fun toggleAlarmEnabled(alarm: Alarm, enable: Boolean = true) {
+        val alarmsEnabled = _uiState.value.enabledAlarms
+        _uiState.update { currentState ->
+            if (enable && !alarmsEnabled.contains(alarm)) {
+                alarmsEnabled.add(alarm)
+            }
+            else if (!enable && alarmsEnabled.contains(alarm)) {
+                alarmsEnabled.remove(alarm)
+            }
+            currentState.copy(enabledAlarms = alarmsEnabled)
+        }
+    }
+
+    fun enableAllAlarms(alarmData: List<Alarm>): Boolean {
+        val alarms =
+            if (_uiState.value.enabledAlarms.size == alarmData.size) mutableListOf<Alarm>()
+            else alarmData.toMutableList()
+        _uiState.update { currentState ->
+            currentState.copy(enabledAlarms = alarms)
+        }
+        return _uiState.value.enabledAlarms.isNotEmpty()
+    }
+
     fun toggleAlarmSelected(alarm: Alarm) {
         val alarmsSelected = _uiState.value.selectedAlarms
         _uiState.update {currentState ->
@@ -56,6 +77,15 @@ class HomeViewModel: ViewModel() {
                 alarmsSelected.add(alarm)
             }
             currentState.copy(selectedAlarms = alarmsSelected)
+        }
+    }
+
+    fun selectAllAlarms(alarmData: List<Alarm>) {
+        val alarms =
+            if (_uiState.value.selectedAlarms.size == alarmData.size) mutableListOf()
+            else alarmData.toMutableList()
+        _uiState.update { currentState ->
+            currentState.copy(selectedAlarms = alarms)
         }
     }
 

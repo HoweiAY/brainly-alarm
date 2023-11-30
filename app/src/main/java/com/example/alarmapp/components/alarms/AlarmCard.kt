@@ -1,7 +1,6 @@
 package com.example.alarmapp.components.alarms
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +17,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,15 +26,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.alarmapp.AlarmScreen
 import com.example.alarmapp.model.data.Alarm
-import com.example.alarmapp.model.data.alarmData
 import com.example.alarmapp.viewmodels.AlarmDatabaseViewModel
 import com.example.alarmapp.viewmodels.HomeViewModel
 
@@ -48,8 +45,16 @@ fun AlarmCard(
     modifier: Modifier = Modifier
 ) {
     val homeUiState by homeViewModel.uiState.collectAsState()
-    var alarmEnabled by remember { mutableStateOf(true) }
+    var alarmEnabled by remember { mutableStateOf(alarm.enabled) }
     var alarmSelected by remember { mutableStateOf(false) }
+
+    LaunchedEffect(homeUiState.enabledAlarms) {
+        alarmEnabled = homeUiState.enabledAlarms.contains(alarm)
+    }
+
+    LaunchedEffect(homeUiState.selectedAlarms) {
+        alarmSelected = homeUiState.selectedAlarms.contains(alarm)
+    }
 
     Card(
         modifier = modifier
@@ -62,7 +67,9 @@ fun AlarmCard(
                         homeViewModel.toggleAlarmSelected(alarm)
                         alarmSelected = homeUiState.selectedAlarms.contains(alarm)
                     } else {
-                        navController.navigate("${AlarmScreen.CreateAlarm.name}/${alarm.id}")
+                        navController.navigate(
+                            "${AlarmScreen.CreateAlarm.name}?alarmId=${alarm.id.toString()}"
+                        )
                     }
                 },
                 onLongClick = {
@@ -97,7 +104,10 @@ fun AlarmCard(
                 Switch(
                     checked = alarmEnabled,
                     onCheckedChange = {
-                        alarmEnabled = it
+                        homeViewModel.toggleAlarmEnabled(alarm, !homeUiState.enabledAlarms.contains(alarm))
+                        alarm.enabled = !alarm.enabled
+                        alarmDatabaseViewModel.updateAlarm(alarm)
+                        alarmEnabled = alarm.enabled
                     },
                     modifier = Modifier
                 )

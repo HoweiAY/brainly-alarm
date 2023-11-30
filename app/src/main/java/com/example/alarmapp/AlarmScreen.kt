@@ -60,8 +60,11 @@ fun AlarmClockApp(
         }
 
         composable(
-            route = "${AlarmScreen.CreateAlarm.name}/{alarmId}",
-            arguments = listOf(navArgument("alarmId") { type = NavType.IntType }),
+            route = "${AlarmScreen.CreateAlarm.name}?alarmId={alarmId}",
+            arguments = listOf(navArgument("alarmId") {
+                type = NavType.StringType
+                nullable = true
+            }),
             enterTransition = { slideInHorizontally(
                 animationSpec = tween(300)
             ) + fadeIn(
@@ -78,7 +81,7 @@ fun AlarmClockApp(
             ) },
         ) {backStackEntry ->
             CreateAlarmMenu(
-                alarmId = backStackEntry.arguments?.getInt("alarmId"),
+                alarmId = backStackEntry.arguments?.getString("alarmId"),
                 alarmDatabaseViewModel = alarmDatabaseViewModel,
                 navController = navController,
             )
