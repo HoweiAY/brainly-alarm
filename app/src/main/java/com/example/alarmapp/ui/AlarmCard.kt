@@ -1,6 +1,5 @@
-package com.example.alarmapp.components.alarms
+package com.example.alarmapp.ui
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -33,8 +32,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.alarmapp.AlarmScreen
 import com.example.alarmapp.model.data.Alarm
-import com.example.alarmapp.viewmodels.AlarmDatabaseViewModel
-import com.example.alarmapp.viewmodels.HomeViewModel
+import com.example.alarmapp.model.data.AlarmDatabaseViewModel
+import com.example.alarmapp.components.menus.viewModels.HomeViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

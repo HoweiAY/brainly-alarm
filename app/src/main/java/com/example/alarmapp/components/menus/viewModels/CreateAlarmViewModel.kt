@@ -1,20 +1,14 @@
-package com.example.alarmapp.viewmodels
+package com.example.alarmapp.components.menus.viewModels
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.example.alarmapp.components.missions.Difficulty
 import com.example.alarmapp.model.data.Alarm
-import com.example.alarmapp.model.data.AlarmDatabase
-import com.example.alarmapp.model.data.AlarmRepository
 import com.example.alarmapp.model.data.taskDifficulties
 import com.example.alarmapp.model.data.taskTypes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlin.math.exp
 
 class CreateAlarmViewModel(): ViewModel() {
     private val _uiState = MutableStateFlow(CreateAlarmUiState())

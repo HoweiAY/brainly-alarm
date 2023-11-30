@@ -1,4 +1,4 @@
-package com.example.alarmapp.viewmodels
+package com.example.alarmapp.components.menus.viewModels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

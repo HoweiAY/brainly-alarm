@@ -1,4 +1,4 @@
-package com.example.alarmapp.viewmodels
+package com.example.alarmapp.model.data
 
 import android.app.Application
 import android.util.Log

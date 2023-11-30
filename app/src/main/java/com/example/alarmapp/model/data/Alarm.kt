@@ -65,7 +65,7 @@ data class Alarm(
         }
     }
 
-    private fun getCalendarDay(day: String): Int {
+    fun getCalendarDay(day: String): Int {
         return when (day.lowercase()) {
             "sun" -> Calendar.SUNDAY
             "mon" -> Calendar.MONDAY

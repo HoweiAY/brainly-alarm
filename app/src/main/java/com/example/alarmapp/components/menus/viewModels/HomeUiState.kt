@@ -1,4 +1,4 @@
-package com.example.alarmapp.viewmodels
+package com.example.alarmapp.components.menus.viewModels
 
 import com.example.alarmapp.model.data.Alarm
 

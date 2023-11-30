@@ -1,6 +1,5 @@
 package com.example.alarmapp.components.menus
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -46,10 +44,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.alarmapp.AlarmScreen
-import com.example.alarmapp.components.alarms.AlarmCard
-import com.example.alarmapp.model.data.Alarm
-import com.example.alarmapp.viewmodels.AlarmDatabaseViewModel
-import com.example.alarmapp.viewmodels.HomeViewModel
+import com.example.alarmapp.ui.AlarmCard
+import com.example.alarmapp.model.data.AlarmDatabaseViewModel
+import com.example.alarmapp.components.menus.viewModels.HomeViewModel
 
 @Composable
 fun HomeMenu(
@@ -89,16 +86,16 @@ fun HomeMenu(
             Column(
                 modifier = modifier.padding(start = 12.dp),
                 horizontalAlignment = Alignment.Start) {
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(50.dp))
                 Text(
                     text = "Welcome to Brainly Alarm!",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     textAlign = TextAlign.Start
                 )
+                Spacer(modifier = Modifier.height(60.dp))
             }
             Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-                Spacer(modifier = Modifier.height(60.dp))
                 Text(
                     //text = nextAlarmMsg,
                     text = nextAlarmMsg,

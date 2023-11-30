@@ -1,11 +1,8 @@
 package com.example.alarmapp
 
 import androidx.annotation.StringRes
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -15,8 +12,6 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -26,8 +21,7 @@ import androidx.navigation.navArgument
 import com.example.alarmapp.components.games.MemoryGame
 import com.example.alarmapp.components.menus.CreateAlarmMenu
 import com.example.alarmapp.components.menus.HomeMenu
-import com.example.alarmapp.model.data.alarmData
-import com.example.alarmapp.viewmodels.AlarmDatabaseViewModel
+import com.example.alarmapp.model.data.AlarmDatabaseViewModel
 
 enum class AlarmScreen(@StringRes val title: Int) {
     Home(title = R.string.home_menu),
