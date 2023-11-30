@@ -1,5 +1,6 @@
 package com.example.alarmapp.components.menus
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,9 +28,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,6 +47,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.alarmapp.AlarmScreen
 import com.example.alarmapp.components.alarms.AlarmCard
+import com.example.alarmapp.model.data.Alarm
 import com.example.alarmapp.viewmodels.AlarmDatabaseViewModel
 import com.example.alarmapp.viewmodels.HomeViewModel
 
@@ -54,16 +60,23 @@ fun HomeMenu(
 ) {
     val homeUiState by homeViewModel.uiState.collectAsState()
     val alarmData by alarmDatabaseViewModel.allAlarms.observeAsState(listOf())
-    val alarmSelected by alarmDatabaseViewModel.foundAlarm.observeAsState()
+    var enabledAlarms by remember { mutableStateOf(homeUiState.enabledAlarms) }
+    var nextAlarmMsg by remember { mutableStateOf("No alarms set") }
 
-    val testAlarm = com.example.alarmapp.model.data.alarmData[1]
-
-
-    alarmData.forEach { alarm ->
-        homeViewModel.toggleAlarmEnabled(alarm, alarm.enabled)
+    LaunchedEffect(alarmData) {
+        alarmData.forEach { alarm ->
+            homeViewModel.toggleAlarmEnabled(alarm, alarm.enabled)
+        }
+        nextAlarmMsg = if (alarmData.isNotEmpty() && homeUiState.enabledAlarms.isNotEmpty())
+        "Next alarm in 3 days 12 hours 4 minutes"
+        else "No alarms set"
     }
 
-
+    LaunchedEffect(homeUiState.enableAlarmChanged) {
+        nextAlarmMsg = if (alarmData.isNotEmpty() && homeUiState.enabledAlarms.isNotEmpty())
+            "Next alarm in 3 days 12 hours 4 minutes"
+        else "No alarms set"
+    }
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween,
@@ -87,13 +100,12 @@ fun HomeMenu(
             Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
                 Spacer(modifier = Modifier.height(60.dp))
                 Text(
-                    text =
-                    if (alarmData.isNotEmpty()) "Next alarm in 3 days 12 hours 4 minutes"
-                    else "No alarms set",
+                    //text = nextAlarmMsg,
+                    text = nextAlarmMsg,
                     fontSize = 30.sp,
                     textAlign = TextAlign.Center,
                     overflow = TextOverflow.Clip,
-                    modifier = modifier
+                    modifier = modifier,
                 )
                 Spacer(modifier = Modifier.height(40.dp))
 

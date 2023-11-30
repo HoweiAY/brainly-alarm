@@ -126,7 +126,7 @@ fun CreateAlarmMenu(
                     .wrapContentHeight()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Text(text = "Set an alarm ${alarm?.id}", fontSize = 30.sp)
+                Text(text = "Set an alarm", fontSize = 30.sp)
             }
             Spacer(modifier = Modifier.height(20.dp))
             TimePicker(state = timePickerState, modifier = modifier)
@@ -172,8 +172,6 @@ fun CreateAlarmMenu(
                                             .contains(weekday),
                                         onClick = {
                                             createAlarmViewModel.updateWeekdays(weekday)
-                                            Log.i("debug select days: ", createAlarmUiState.weekdaysSelected.toString())
-                                            Log.i("debug select days: ", createAlarmUiState.weekdaysSelected.contains(weekday).toString())
                                         }
                                     )
                                 }
@@ -387,9 +385,11 @@ fun CreateAlarmMenu(
             }
             TextButton(
                 onClick = {
-                    var id = -1
+                    var alarmDays =
+                        if (createAlarmUiState.weekdaysSelected.isEmpty()) weekdays
+                        else createAlarmUiState.weekdaysSelected
                     if (alarm != null) {
-                        alarm!!.days = createAlarmUiState.weekdaysSelected
+                        alarm!!.days = alarmDays
                         alarm!!.hour = timePickerState.hour
                         alarm!!.minute = timePickerState.minute
                         alarm!!.task = createAlarmUiState.taskSelected
@@ -399,11 +399,10 @@ fun CreateAlarmMenu(
                         alarm!!.snooze = createAlarmUiState.snoozeEnabled
                         alarm!!.enabled = true
                         alarmDatabaseViewModel.updateAlarm(alarm!!)
-                        id = alarm!!.id
                         alarm = null
                     } else {
                         val createAlarm = Alarm(
-                            days = createAlarmUiState.weekdaysSelected,
+                            days = alarmDays,
                             hour = timePickerState.hour,
                             minute = timePickerState.minute,
                             task = createAlarmUiState.taskSelected,
@@ -414,10 +413,8 @@ fun CreateAlarmMenu(
                             enabled = true,
                         )
                         alarmDatabaseViewModel.insertAlarm(createAlarm)
-                        id = createAlarm.id
                     }
                     createAlarmViewModel.resetUiState(null)
-                    Log.i("debug create alarm save:", "saving alarm id: $id")
                     navController.popBackStack()
                 }
             ) {
@@ -445,7 +442,6 @@ fun WeekdayTextButton(
         onClick = {
             onClick()
             daySelected = !daySelected
-            Log.i("debug weekday button:", "$weekday selected: $daySelected")
             buttonColor = if (daySelected) Color.LightGray else Color.Transparent
             textColor = if (daySelected) Color.Red else Color.Unspecified
         }

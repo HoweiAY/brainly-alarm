@@ -1,5 +1,6 @@
 package com.example.alarmapp.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.alarmapp.model.data.Alarm
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,8 @@ class HomeViewModel: ViewModel() {
             currentState.copy(
                 optionsExpanded = false,
                 alarmEditEnabled = false,
-                selectedAlarms = mutableListOf<Alarm>()
+                selectedAlarms = mutableListOf<Alarm>(),
+                enabledAlarms = mutableListOf<Alarm>()
             )
         }
     }
@@ -46,15 +48,17 @@ class HomeViewModel: ViewModel() {
 
     fun toggleAlarmEnabled(alarm: Alarm, enable: Boolean = true) {
         val alarmsEnabled = _uiState.value.enabledAlarms
-        _uiState.update { currentState ->
-            if (enable && !alarmsEnabled.contains(alarm)) {
-                alarmsEnabled.add(alarm)
-            }
-            else if (!enable && alarmsEnabled.contains(alarm)) {
-                alarmsEnabled.remove(alarm)
-            }
-            currentState.copy(enabledAlarms = alarmsEnabled)
+        if (enable && !alarmsEnabled.contains(alarm)) {
+            alarmsEnabled.add(alarm)
         }
+        else if (!enable && alarmsEnabled.contains(alarm)) {
+            alarmsEnabled.remove(alarm)
+        }
+        _uiState.update { currentState ->
+            currentState.copy(enabledAlarms = alarmsEnabled, enableAlarmChanged = !_uiState.value.enableAlarmChanged)
+        }
+        Log.i("debug toggleAlarmEnabled", "toggleAlarmEnabled: ${_uiState.value.enabledAlarms}")
+        Log.i("debug toggleAlarmEnabled", "enableAlarmChanged: ${_uiState.value.enableAlarmChanged}")
     }
 
     fun enableAllAlarms(alarmData: List<Alarm>): Boolean {
@@ -62,7 +66,7 @@ class HomeViewModel: ViewModel() {
             if (_uiState.value.enabledAlarms.size == alarmData.size) mutableListOf<Alarm>()
             else alarmData.toMutableList()
         _uiState.update { currentState ->
-            currentState.copy(enabledAlarms = alarms)
+            currentState.copy(enabledAlarms = alarms, enableAlarmChanged = !_uiState.value.enableAlarmChanged)
         }
         return _uiState.value.enabledAlarms.isNotEmpty()
     }
