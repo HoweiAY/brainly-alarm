@@ -26,11 +26,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.alarmapp.AlarmScreen
+import com.example.alarmapp.components.alarm.AlarmViewModel
 import com.example.alarmapp.model.data.Alarm
 import com.example.alarmapp.model.data.AlarmDatabaseViewModel
 import com.example.alarmapp.components.menus.viewModels.HomeViewModel
@@ -44,6 +46,7 @@ fun AlarmCard(
     homeViewModel: HomeViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
+    val alarmViewModel = AlarmViewModel(LocalContext.current)
     val homeUiState by homeViewModel.uiState.collectAsState()
     var alarmEnabled by remember { mutableStateOf(alarm.enabled) }
     var alarmSelected by remember { mutableStateOf(false) }
@@ -108,6 +111,8 @@ fun AlarmCard(
                         alarm.enabled = !alarm.enabled
                         alarmDatabaseViewModel.updateAlarm(alarm)
                         alarmEnabled = alarm.enabled
+                        if (alarm.enabled) alarmViewModel.setAlarm(alarm)
+                        else alarmViewModel.cancelAlarm(alarm)
                     },
                     modifier = Modifier
                 )

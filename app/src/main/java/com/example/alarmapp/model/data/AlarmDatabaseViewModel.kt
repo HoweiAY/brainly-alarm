@@ -42,8 +42,8 @@ class AlarmDatabaseViewModel(application: Application): ViewModel() {
         Log.i("debug deleteAlarm viewModel: ", "Deleting alarm with ID ${alarm.id}")
     }
 
-    fun getAllAlarms() {
-        alarmRepository.getAllAlarms()
+    fun getAllAlarms(): List<Alarm> {
+        return allAlarms.value ?: emptyList()
     }
 
     fun getAlarmById(id: Int) {

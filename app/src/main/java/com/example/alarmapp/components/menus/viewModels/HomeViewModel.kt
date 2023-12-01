@@ -22,7 +22,7 @@ class HomeViewModel: ViewModel() {
                 optionsExpanded = false,
                 alarmEditEnabled = false,
                 selectedAlarms = mutableListOf<Alarm>(),
-                enabledAlarms = mutableListOf<Alarm>()
+                //enabledAlarms = mutableListOf<Alarm>()
             )
         }
     }

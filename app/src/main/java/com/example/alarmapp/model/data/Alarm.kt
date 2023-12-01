@@ -71,7 +71,7 @@ data class Alarm(
             "mon" -> Calendar.MONDAY
             "tue" -> Calendar.TUESDAY
             "wed" -> Calendar.WEDNESDAY
-            "thur" -> Calendar.THURSDAY
+            "thu" -> Calendar.THURSDAY
             "fri" -> Calendar.FRIDAY
             "sat" -> Calendar.SATURDAY
             else -> throw IllegalArgumentException("Invalid day of week: $day")

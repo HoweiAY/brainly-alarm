@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.alarmapp.AlarmScreen
+import com.example.alarmapp.components.alarm.AlarmViewModel
 import com.example.alarmapp.ui.AlarmCard
 import com.example.alarmapp.model.data.AlarmDatabaseViewModel
 import com.example.alarmapp.components.menus.viewModels.HomeViewModel
@@ -55,6 +57,7 @@ fun HomeMenu(
     homeViewModel: HomeViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
+    val alarmViewModel = AlarmViewModel(LocalContext.current)
     val homeUiState by homeViewModel.uiState.collectAsState()
     val alarmData by alarmDatabaseViewModel.allAlarms.observeAsState(listOf())
     var enabledAlarms by remember { mutableStateOf(homeUiState.enabledAlarms) }
@@ -153,6 +156,8 @@ fun HomeMenu(
                                             alarmData.forEach { alarm ->
                                                 alarm.enabled = allEnabled
                                                 alarmDatabaseViewModel.updateAlarm(alarm)
+                                                if (alarm.enabled) alarmViewModel.setAlarm(alarm)
+                                                else alarmViewModel.cancelAlarm(alarm)
                                             }
                                         }
                                     )
