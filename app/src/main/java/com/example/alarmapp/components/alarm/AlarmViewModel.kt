@@ -35,11 +35,14 @@ class AlarmViewModel(private val context: Context): ViewModel() {
             val intent = Intent(context, AlarmReceiver::class.java)
             intent.putExtra("alarmId", alarmId)
             intent.putExtra("dayOfWeek", dayOfWeek)
+            intent.putExtra("hour", alarm.hour)
+            intent.putExtra("minute", alarm.minute)
             intent.putExtra("task", alarm.task)
             intent.putExtra("roundCount", alarm.rounds)
             intent.putExtra("difficulty", alarm.difficulty)
             intent.putExtra("sound", alarm.sound)
             intent.putExtra("snooze", alarm.snooze)
+            intent.putExtra("alarmTriggered", true)
 
             val requestCode = getPendingIntentRequestCode(alarmId, dayOfWeek)
             val pendingIntent = PendingIntent.getBroadcast(

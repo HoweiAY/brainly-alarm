@@ -19,6 +19,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         createNotificationChannel()
 
+        val alarmIntent = intent
+
         setContent {
             //MemoryGame()
             //PhoneShaking()
@@ -33,7 +35,7 @@ class MainActivity : ComponentActivity() {
                         LocalContext.current.applicationContext as Application
                     )
                 )
-                AlarmClockApp(alarmDatabaseViewModel = alarmDatabaseViewModel)
+                AlarmClockApp(alarmIntent, alarmDatabaseViewModel = alarmDatabaseViewModel)
             }
         }
     }

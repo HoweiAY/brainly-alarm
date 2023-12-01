@@ -1,7 +1,12 @@
 <resources>
     <string name="app_name">Brainly Alarm</string>
+
+    <string name="main_screen">Main screen</string>
+    <string name="alarm_screen">Alarm screen</string>
+
     <string name="home_menu">Home menu</string>
     <string name="create_alarm_menu">Create an alarm</string>
+    <string name="display_alarm_screen">Alarm display</string>
 
     <string name="memory_game">Memory</string>
 </resources>
