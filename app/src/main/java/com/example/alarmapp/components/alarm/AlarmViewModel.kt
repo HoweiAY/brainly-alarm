@@ -42,6 +42,7 @@ class AlarmViewModel(private val context: Context): ViewModel() {
             intent.putExtra("difficulty", alarm.difficulty)
             intent.putExtra("sound", alarm.sound)
             intent.putExtra("snooze", alarm.snooze)
+            intent.putExtra("enabled", alarm.enabled)
             intent.putExtra("alarmTriggered", true)
 
             val requestCode = getPendingIntentRequestCode(alarmId, dayOfWeek)

@@ -57,9 +57,9 @@ fun AlarmClockApp(
 
     NavHost(
         navController = navController,
-        startDestination = AppScreen.MainScreen.name,
+        //startDestination = AppScreen.MainScreen.name,
         //startDestination = AppScreen.AlarmScreen.name,
-        //startDestination = if (isAlarmTriggered.value) AppScreen.AlarmScreen.name else AppScreen.MainScreen.name,
+        startDestination = if (isAlarmTriggered.value) AppScreen.AlarmScreen.name else AppScreen.MainScreen.name,
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },
         modifier = Modifier

@@ -1,5 +1,6 @@
 package com.example.alarmapp.components.menus
 
+import android.icu.util.Calendar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,6 +51,7 @@ import com.example.alarmapp.components.alarm.AlarmViewModel
 import com.example.alarmapp.ui.AlarmCard
 import com.example.alarmapp.model.data.AlarmDatabaseViewModel
 import com.example.alarmapp.components.menus.viewModels.HomeViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeMenu(
@@ -60,21 +63,38 @@ fun HomeMenu(
     val alarmViewModel = AlarmViewModel(LocalContext.current)
     val homeUiState by homeViewModel.uiState.collectAsState()
     val alarmData by alarmDatabaseViewModel.allAlarms.observeAsState(listOf())
-    var enabledAlarms by remember { mutableStateOf(homeUiState.enabledAlarms) }
-    var nextAlarmMsg by remember { mutableStateOf("No alarms set") }
+
+    var nextAlarmMsg by remember { mutableStateOf(homeUiState.nextAlarmMsg) }
+    var currentMinute by remember { mutableIntStateOf(Calendar.getInstance().get(Calendar.MINUTE)) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            val nextMinute = Calendar.getInstance().get(Calendar.MINUTE)
+            if (currentMinute != nextMinute) {
+                homeViewModel.updateNextAlarm(homeUiState.enabledAlarms)
+                currentMinute = nextMinute
+            }
+            delay(1000)
+        }
+    }
 
     LaunchedEffect(alarmData) {
         alarmData.forEach { alarm ->
             homeViewModel.toggleAlarmEnabled(alarm, alarm.enabled)
         }
-        nextAlarmMsg = if (alarmData.isNotEmpty() && homeUiState.enabledAlarms.isNotEmpty())
-        "Next alarm in 3 days 12 hours 4 minutes"
+        homeViewModel.updateNextAlarm(homeUiState.enabledAlarms)
+        nextAlarmMsg = if (alarmData.isNotEmpty() && homeUiState.enabledAlarms.isNotEmpty()) homeUiState.nextAlarmMsg
+        else "No alarms set"
+    }
+
+    LaunchedEffect(homeUiState.alarmMsgChanged) {
+        nextAlarmMsg = if (alarmData.isNotEmpty() && homeUiState.enabledAlarms.isNotEmpty()) homeUiState.nextAlarmMsg
         else "No alarms set"
     }
 
     LaunchedEffect(homeUiState.enableAlarmChanged) {
-        nextAlarmMsg = if (alarmData.isNotEmpty() && homeUiState.enabledAlarms.isNotEmpty())
-            "Next alarm in 3 days 12 hours 4 minutes"
+        homeViewModel.updateNextAlarm(homeUiState.enabledAlarms)
+        nextAlarmMsg = if (alarmData.isNotEmpty() && homeUiState.enabledAlarms.isNotEmpty()) homeUiState.nextAlarmMsg
         else "No alarms set"
     }
     Column(
@@ -98,14 +118,18 @@ fun HomeMenu(
                 )
                 Spacer(modifier = Modifier.height(60.dp))
             }
-            Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                modifier = modifier
+                    .padding(horizontal = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     //text = nextAlarmMsg,
                     text = nextAlarmMsg,
                     fontSize = 30.sp,
                     textAlign = TextAlign.Center,
                     overflow = TextOverflow.Clip,
-                    modifier = modifier,
+                    modifier = modifier.height(70.dp),
                 )
                 Spacer(modifier = Modifier.height(40.dp))
 
@@ -159,6 +183,7 @@ fun HomeMenu(
                                                 if (alarm.enabled) alarmViewModel.setAlarm(alarm)
                                                 else alarmViewModel.cancelAlarm(alarm)
                                             }
+                                            homeViewModel.updateNextAlarm(alarmData)
                                         }
                                     )
                                     DropdownMenuItem(
@@ -176,7 +201,9 @@ fun HomeMenu(
                                 if (homeUiState.selectedAlarms.isNotEmpty()) {
                                     homeUiState.selectedAlarms.forEach {
                                         alarmDatabaseViewModel.deleteAlarm(it)
+                                        alarmViewModel.cancelAlarm(it)
                                     }
+                                    homeViewModel.updateNextAlarm(alarmData)
                                     homeViewModel.cancelAlarmsEdit()
                                 }
                             }
