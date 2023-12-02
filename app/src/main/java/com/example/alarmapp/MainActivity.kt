@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
                         LocalContext.current.applicationContext as Application
                     )
                 )
-                AlarmClockApp(alarmIntent, context, {stopAlarmSound()}, alarmDatabaseViewModel = alarmDatabaseViewModel)
+                BrainlyAlarmApp(alarmIntent, context, {stopAlarmSound()}, alarmDatabaseViewModel = alarmDatabaseViewModel)
             }
         }
     }

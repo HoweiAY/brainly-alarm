@@ -9,4 +9,6 @@
     <string name="display_alarm_screen">Alarm display</string>
 
     <string name="memory_game">Memory</string>
+    <string name="math_equation">Math</string>
+    <string name="phone_shaking">Shake phone</string>
 </resources>

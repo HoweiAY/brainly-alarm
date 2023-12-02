@@ -50,8 +50,10 @@
 
                 alarmScreenIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
+                context?.startActivity(alarmScreenIntent)
+
                 val pendingIntent = PendingIntent.getActivity(
-                    context, 0, alarmScreenIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
+                    context, 0, alarmScreenIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 )
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -72,7 +74,6 @@
                 soundManager = AlarmSoundManager.getInstance(context)
                 soundManager?.playAlarmSound(sound)
 
-                context?.startActivity(alarmScreenIntent)
             }
 
             val alarmId = intent?.getIntExtra("alarmId", -1) ?: return

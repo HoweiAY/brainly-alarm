@@ -1,5 +1,6 @@
 package com.example.alarmapp.components.tasks
 
+import android.app.Activity
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -16,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -32,7 +32,10 @@ import androidx.compose.ui.unit.sp
 import com.example.alarmapp.R
 
 @Composable
-fun PhoneShaking(){
+fun PhoneShaking(
+    context: Context = LocalContext.current,
+    stopAlarmSound: () -> Unit,
+) {
     var remainingShakeTime by remember { mutableIntStateOf((15..30).random()) }
 
     val sensorManager = LocalContext.current.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -44,7 +47,8 @@ fun PhoneShaking(){
     var lastShakeTime: Long = 0
 
     fun handleTaskCompleted(){
-
+        stopAlarmSound()
+        (context as? Activity)?.finish()
     }
 
     val sensorEventListener = object : SensorEventListener {
@@ -116,5 +120,5 @@ fun PhoneShaking(){
 @Preview
 @Composable
 fun PhoneShakingPreview() {
-    PhoneShaking()
+    //PhoneShaking()
 }

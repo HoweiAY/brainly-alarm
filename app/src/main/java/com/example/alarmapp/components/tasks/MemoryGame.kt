@@ -1,21 +1,34 @@
-package com.example.alarmapp.components.games
+package com.example.alarmapp.components.tasks
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.dp
+import android.app.Activity
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.Alignment
-import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -23,8 +36,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun MemoryGame(difficulty: String, rounds: Int){
-    TileBoard(difficulty, rounds)
+fun MemoryGame(
+    difficulty: String,
+    rounds: Int,
+    context: Context = LocalContext.current,
+    stopAlarmSound: () -> Unit,
+){
+    TileBoard(difficulty, rounds, context, stopAlarmSound)
 }
 
 enum class TileState{
@@ -37,7 +55,9 @@ enum class TileState{
 @Composable
 private fun TileBoard(
     difficulty: String = "Easy",
-    rounds: Int = 2
+    rounds: Int = 1,
+    context: Context = LocalContext.current,
+    stopAlarmSound: () -> Unit,
 ) {
     val gridSize = when(difficulty){
         "Easy" -> 3
@@ -59,7 +79,9 @@ private fun TileBoard(
     var currentRound by remember { mutableIntStateOf(1) }
     var playerTurn by remember { mutableStateOf(false) }
     var titleText by remember { mutableStateOf("") }
-    val gridItems = remember { mutableStateListOf<TileState>().apply { repeat(gridSize * gridSize) { add(TileState.DEFAULT) } } }
+    val gridItems = remember { mutableStateListOf<TileState>().apply { repeat(gridSize * gridSize) { add(
+        TileState.DEFAULT
+    ) } } }
 
 
     suspend fun start() {
@@ -81,8 +103,9 @@ private fun TileBoard(
         titleText = "Click the tiles in order!"
     }
 
-    fun handleTaskCompleted(){
-
+    fun handleTaskCompleted() {
+        stopAlarmSound()
+        (context as? Activity)?.finish()
     }
 
     suspend fun handleWrongTileClick(index: Int) {
@@ -181,5 +204,5 @@ private fun TileBoard(
 @Preview
 @Composable
 fun PreviewMemoryGame() {
-    MemoryGame("Easy", 5)
+    //MemoryGame("Easy", 5)
 }

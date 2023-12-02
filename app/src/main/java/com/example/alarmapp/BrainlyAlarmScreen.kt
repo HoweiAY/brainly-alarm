@@ -24,10 +24,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.alarmapp.components.alarm.AlarmDisplay
-import com.example.alarmapp.components.games.MemoryGame
 import com.example.alarmapp.components.menus.CreateAlarmMenu
 import com.example.alarmapp.components.menus.HomeMenu
+import com.example.alarmapp.components.tasks.MathEquation
+import com.example.alarmapp.components.tasks.MemoryGame
+import com.example.alarmapp.components.tasks.PhoneShaking
 import com.example.alarmapp.model.data.AlarmDatabaseViewModel
+import com.example.alarmapp.model.data.taskDifficulties
 
 enum class AppScreen(@StringRes val title: Int) {
     MainScreen(title = R.string.main_screen),
@@ -42,10 +45,12 @@ enum class AlarmScreen(@StringRes val title: Int) {
 
 enum class TasksScreen(@StringRes val title: Int) {
     MemoryGame(title = R.string.memory_game),
+    MathEquation(title = R.string.math_equation),
+    PhoneShaking(title = R.string.phone_shaking),
 }
 
 @Composable
-fun AlarmClockApp(
+fun BrainlyAlarmApp (
     alarmIntent: Intent,
     context: Context,
     stopAlarmSound: () -> Unit,
@@ -113,7 +118,6 @@ fun AlarmClockApp(
         ) {
             composable(route = AlarmScreen.DisplayAlarm.name) {
                 AlarmDisplay(
-                    //alarmDatabaseViewModel = alarmDatabaseViewModel,
                     alarmIntent = alarmIntent,
                     stopAlarmSound = stopAlarmSound,
                     context = context,
@@ -121,8 +125,36 @@ fun AlarmClockApp(
                 )
             }
 
-            composable(route = TasksScreen.MemoryGame.name) {
-                MemoryGame("Easy", 2)
+            composable(
+                route = "${TasksScreen.MemoryGame.name}/{rounds}/{difficulty}"
+            ) { backStackEntry ->
+                val rounds = backStackEntry.arguments?.getString("rounds")?.toInt()?: 1
+                val difficulty = backStackEntry.arguments?.getString("difficulty")?: taskDifficulties[0]
+                MemoryGame(
+                    difficulty = difficulty,
+                    rounds = rounds,
+                    context = context,
+                    stopAlarmSound = stopAlarmSound,
+                )
+            }
+
+            composable(
+                route = "${TasksScreen.MathEquation.name}/{rounds}/{difficulty}"
+            ) {backStackEntry ->
+                val rounds = backStackEntry.arguments?.getString("rounds")?.toInt()?: 1
+                val difficulty = backStackEntry.arguments?.getString("difficulty")?: taskDifficulties[0]
+                MathEquation(
+                    difficulty = difficulty,
+                    rounds = rounds,
+                    stopAlarmSound = stopAlarmSound,
+                )
+            }
+
+            composable(route = TasksScreen.PhoneShaking.name) {
+                PhoneShaking(
+                    context = context,
+                    stopAlarmSound = stopAlarmSound,
+                )
             }
         }
     }

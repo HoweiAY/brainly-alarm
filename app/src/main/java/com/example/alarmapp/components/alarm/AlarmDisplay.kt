@@ -97,9 +97,21 @@ fun AlarmDisplay(
         ) {
             Button(
                 onClick = {
-                    if (task == "None") {
-                        stopAlarmSound()
-                        alarmViewModel.cancelAlarm(
+                    alarmViewModel.cancelAlarm(
+                        updatedAlarm(
+                            id = id,
+                            day = day,
+                            hour = hour,
+                            minute = minute,
+                            task = task,
+                            roundCount = roundCount,
+                            difficulty = difficulty,
+                            sound = sound,
+                            snooze = snooze
+                        )
+                    )
+                    if (enabled) {
+                        alarmViewModel.setAlarm(
                             updatedAlarm(
                                 id = id,
                                 day = day,
@@ -110,26 +122,25 @@ fun AlarmDisplay(
                                 difficulty = difficulty,
                                 sound = sound,
                                 snooze = snooze
-                                )
                             )
-                        if (enabled) {
-                            alarmViewModel.setAlarm(
-                                updatedAlarm(
-                                    id = id,
-                                    day = day,
-                                    hour = hour,
-                                    minute = minute,
-                                    task = task,
-                                    roundCount = roundCount,
-                                    difficulty = difficulty,
-                                    sound = sound,
-                                    snooze = snooze
-                                )
-                            )
-                        }
+                        )
+                    }
+                    if (task == taskTypes[3]) {
+                        stopAlarmSound()
                         (context as? Activity)?.finish()
                     } else {
-                        navController.navigate(TasksScreen.MemoryGame.name)
+                        when (task) {
+                            taskTypes[0] -> navController.navigate(
+                                "${TasksScreen.MemoryGame.name}/$roundCount/$difficulty"
+                            )
+                            taskTypes[1] -> navController.navigate(
+                                "${TasksScreen.MathEquation.name}/$roundCount/$difficulty"
+                            )
+                            taskTypes[2] -> navController.navigate(
+                                TasksScreen.PhoneShaking.name
+                            )
+                            else -> { (context as? Activity)?.finish() }
+                        }
                     }
                 },
                 modifier = Modifier
