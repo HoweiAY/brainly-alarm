@@ -69,21 +69,7 @@
                     notificationManager.notify(1, builder.build())
                 }
 
-                /*if (sound == null || (sound != null && sound == "Default")) {
-                    alarmSound = RingtoneManager.getRingtone(
-                        context, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-                    )
-                } else {
-                    sound?.let {
-                        alarmSound = RingtoneManager.getRingtone(
-                            context, Uri.parse(sound)
-                        )
-                    }
-                }
-                alarmSound?.isLooping = true
-                alarmSound?.play()*/
-
-                soundManager = AlarmSoundManager(context)
+                soundManager = AlarmSoundManager.getInstance(context)
                 soundManager?.playAlarmSound(sound)
 
                 context?.startActivity(alarmScreenIntent)
@@ -92,9 +78,4 @@
             val alarmId = intent?.getIntExtra("alarmId", -1) ?: return
             Log.d("debug AlarmReceiver:", "RECEIVED ALARM ID $alarmId: $day")
         }
-
-        /*fun stopAlarmSound() {
-            alarmSound?.stop()
-            alarmSound = null
-        }*/
     }

@@ -47,7 +47,6 @@ fun AlarmDisplay(
     navController: NavController,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
     val alarmViewModel = AlarmViewModel(context)
     val alarmReceiver = AlarmReceiver()
 

@@ -1,5 +1,6 @@
 package com.example.alarmapp.components.menus
 
+import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -47,7 +48,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -66,13 +66,13 @@ import com.example.alarmapp.model.data.weekdays
 @Composable
 fun CreateAlarmMenu(
     alarmId: String? = null,
+    context: Context,
     navController: NavHostController,
     alarmDatabaseViewModel: AlarmDatabaseViewModel,
     createAlarmViewModel: CreateAlarmViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val alarmViewModel = AlarmViewModel(context)
+    val alarmViewModel = AlarmViewModel(context.applicationContext)
     val createAlarmUiState by createAlarmViewModel.uiState.collectAsState()
     var alarmLoaded by remember { mutableStateOf(false) }
     var alarm by remember(alarmId) { mutableStateOf<Alarm?>(null) }

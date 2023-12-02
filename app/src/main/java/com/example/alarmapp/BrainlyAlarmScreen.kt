@@ -1,5 +1,6 @@
 package com.example.alarmapp
 
+import android.content.Context
 import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.animation.EnterTransition
@@ -15,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -47,6 +47,7 @@ enum class TasksScreen(@StringRes val title: Int) {
 @Composable
 fun AlarmClockApp(
     alarmIntent: Intent,
+    context: Context,
     stopAlarmSound: () -> Unit,
     navController: NavHostController = rememberNavController(),
     alarmDatabaseViewModel: AlarmDatabaseViewModel,
@@ -99,6 +100,7 @@ fun AlarmClockApp(
             ) {backStackEntry ->
                 CreateAlarmMenu(
                     alarmId = backStackEntry.arguments?.getString("alarmId"),
+                    context = context,
                     alarmDatabaseViewModel = alarmDatabaseViewModel,
                     navController = navController,
                 )
@@ -114,7 +116,7 @@ fun AlarmClockApp(
                     //alarmDatabaseViewModel = alarmDatabaseViewModel,
                     alarmIntent = alarmIntent,
                     stopAlarmSound = stopAlarmSound,
-                    context = LocalContext.current,
+                    context = context,
                     navController = navController
                 )
             }
