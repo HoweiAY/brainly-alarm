@@ -4,7 +4,7 @@ package com.example.alarmapp.model.data
 val weekdays = listOf<String>("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 // list of task types
-val taskTypes = listOf<String>("Memory", "Math", "Shake phone", "Scan code", "None")
+val taskTypes = listOf<String>("Memory", "Math", "Shake phone", "None")
 
 //list of task difficulties
 val taskDifficulties = listOf<String>("Easy", "Normal", "Hard")

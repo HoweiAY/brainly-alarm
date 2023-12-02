@@ -25,19 +25,21 @@
             //val alarmViewModel = AlarmViewModel(context)
             //val alarmDatabaseViewModel = AlarmDatabaseViewModel(context.applicationContext as Application)
             val today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
+            val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+            val currentMinute = Calendar.getInstance().get(Calendar.MINUTE)
 
             val id = intent?.getIntExtra("alarmId", 0)
             val day = intent?.getIntExtra("dayOfWeek", today)
-            var hour = intent?.getIntExtra("hour", 8)
-            var minute = intent?.getIntExtra("minute", 0)
-            var task = intent?.getStringExtra("task")
-            var roundCount = intent?.getIntExtra("roundCount", 1)
-            var difficulty = intent?.getStringExtra("difficulty")
-            var sound = intent?.getStringExtra("sound")
-            var snooze = intent?.getBooleanExtra("snooze", true)
-            var enabled = intent?.getBooleanExtra("enabled", true)
+            val hour = intent?.getIntExtra("hour", -1)
+            val minute = intent?.getIntExtra("minute", -1)
+            val task = intent?.getStringExtra("task")
+            val roundCount = intent?.getIntExtra("roundCount", 1)
+            val difficulty = intent?.getStringExtra("difficulty")
+            val sound = intent?.getStringExtra("sound")
+            val snooze = intent?.getBooleanExtra("snooze", true)
+            val enabled = intent?.getBooleanExtra("enabled", true)
 
-            if (today == day) {
+            if (today == day && hour == currentHour && minute == currentMinute) {
                 val alarmScreenIntent = Intent(context, MainActivity::class.java)
 
                 alarmScreenIntent.putExtra("alarmId", id)
@@ -52,7 +54,7 @@
                 alarmScreenIntent.putExtra("enabled", enabled)
                 alarmScreenIntent.putExtra("alarmTriggered", true)
 
-                alarmScreenIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                alarmScreenIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
                 val pendingIntent = PendingIntent.getActivity(
                     context, 0, alarmScreenIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT

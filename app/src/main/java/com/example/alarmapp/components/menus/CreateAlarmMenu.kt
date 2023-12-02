@@ -256,9 +256,8 @@ fun CreateAlarmMenu(
                                     Text(text = "1")
                                     Slider(
                                         modifier = modifier.width(170.dp),
-                                        enabled = taskTypes
-                                            .slice(2 until taskTypes.size)
-                                            .any { it != createAlarmUiState.taskSelected },
+                                        enabled = createAlarmUiState.taskSelected != taskTypes[2] &&
+                                            createAlarmUiState.taskSelected != taskTypes[3],
                                         value = createAlarmUiState.roundsSelected.toFloat(),
                                         onValueChange = { createAlarmViewModel.updateRoundCount(it.toInt()) },
                                         steps = 3,
@@ -293,8 +292,8 @@ fun CreateAlarmMenu(
                                         RadioButton(
                                             selected = difficulty == createAlarmUiState.difficultySelected,
                                             onClick = { createAlarmViewModel.updateTaskDifficulty(difficulty) },
-                                            enabled = createAlarmUiState.difficultySelected == taskTypes[0] ||
-                                                    createAlarmUiState.difficultySelected != taskTypes[1]
+                                            enabled = createAlarmUiState.taskSelected != taskTypes[2] &&
+                                                    createAlarmUiState.taskSelected != taskTypes[3]
                                         )
                                         Text(text = difficulty)
                                     }
