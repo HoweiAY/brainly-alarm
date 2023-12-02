@@ -176,12 +176,19 @@ class HomeViewModel: ViewModel() {
             if (currentMinute > alarmMinute) 60 - currentMinute + alarmMinute
             else alarmMinute - currentMinute
 
-        var nextAlarmHour = if (currentHour > alarmHour) {
-            if (currentMinute > alarmMinute) 24 - currentHour + alarmHour - 1
-            else 24 - currentHour + alarmHour
-        } else {
-            if (currentMinute > alarmMinute) alarmHour - currentHour - 1
-            else alarmHour - currentHour
+        var nextAlarmHour = when {
+            currentHour == alarmHour -> {
+                if (currentDay == alarmDay && currentMinute > alarmMinute) 23 else 0
+            }
+            else -> {
+                if (currentHour > alarmHour) {
+                    if (currentMinute > alarmMinute) 24 - abs(currentHour - alarmHour) - 1
+                    else 24 - abs(currentHour - alarmHour)
+                } else {
+                    if (currentMinute > alarmMinute) alarmHour - currentHour - 1
+                    else alarmHour - currentHour
+                }
+            }
         }
 
         var nextAlarmDay = when {
@@ -223,9 +230,11 @@ class HomeViewModel: ViewModel() {
         var nextAlarmDay: Int? = null
         var nextAlarmHour: Int? = null
         var nextAlarmMinute: Int? = null
-        var nextAlarmCalendar: Calendar = Calendar.getInstance()
+        var nextAlarmCalendar: Calendar = currentCalendar
 
         for (calendar in calendars) {
+            //if (calendar.timeInMillis - currentCalendar.timeInMillis <= 0) continue
+
             val alarmDay = calendar.get(Calendar.DAY_OF_WEEK)
             val alarmHour = calendar.get(Calendar.HOUR_OF_DAY)
             val alarmMinute = calendar.get(Calendar.MINUTE)
@@ -234,12 +243,19 @@ class HomeViewModel: ViewModel() {
                 if (currentMinute > alarmMinute) 60 - currentMinute + alarmMinute
                 else alarmMinute - currentMinute
 
-            val hourDifference = if (currentHour > alarmHour) {
-                if (currentMinute > alarmMinute) 24 - currentHour + alarmHour - 1
-                else 24 - currentHour + alarmHour
-            } else {
-                if (currentMinute > alarmMinute) alarmHour - currentHour - 1
-                else alarmHour - currentHour
+            val hourDifference = when {
+                currentHour == alarmHour -> {
+                    if (currentDay == alarmDay && currentMinute > alarmMinute) 23 else 0
+                    }
+                else -> {
+                    if (currentHour > alarmHour) {
+                        if (currentMinute > alarmMinute) 24 - abs(currentHour - alarmHour) - 1
+                        else 24 - abs(currentHour - alarmHour)
+                    } else {
+                        if (currentMinute > alarmMinute) alarmHour - currentHour - 1
+                        else alarmHour - currentHour
+                    }
+                }
             }
 
             val dayDifference = when {

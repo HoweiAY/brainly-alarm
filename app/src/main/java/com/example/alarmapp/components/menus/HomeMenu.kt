@@ -68,6 +68,10 @@ fun HomeMenu(
     var currentMinute by remember { mutableIntStateOf(Calendar.getInstance().get(Calendar.MINUTE)) }
 
     LaunchedEffect(Unit) {
+        alarmData.forEach { alarm ->
+            homeViewModel.toggleAlarmEnabled(alarm, alarm.enabled)
+            if (alarm.enabled) alarmViewModel.setAlarm(alarm) else alarmViewModel.cancelAlarm(alarm)
+        }
         while (true) {
             val nextMinute = Calendar.getInstance().get(Calendar.MINUTE)
             if (currentMinute != nextMinute) {
@@ -81,6 +85,7 @@ fun HomeMenu(
     LaunchedEffect(alarmData) {
         alarmData.forEach { alarm ->
             homeViewModel.toggleAlarmEnabled(alarm, alarm.enabled)
+            if (alarm.enabled) alarmViewModel.setAlarm(alarm) else alarmViewModel.cancelAlarm(alarm)
         }
         homeViewModel.updateNextAlarm(homeUiState.enabledAlarms)
         nextAlarmMsg = if (alarmData.isNotEmpty() && homeUiState.enabledAlarms.isNotEmpty()) homeUiState.nextAlarmMsg

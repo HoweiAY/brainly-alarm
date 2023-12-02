@@ -32,7 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.alarmapp.AlarmScreen
 import com.example.alarmapp.AppScreen
+import com.example.alarmapp.TasksScreen
 import com.example.alarmapp.model.data.Alarm
 import com.example.alarmapp.model.data.taskDifficulties
 import com.example.alarmapp.model.data.taskTypes
@@ -61,7 +63,7 @@ fun AlarmDisplay(
     var enabled by remember { mutableStateOf(alarmIntent.getBooleanExtra("enabled", true)) }
 
     LaunchedEffect(Unit) {
-        if (task == null) task = taskTypes[4]
+        if (task == null) task = taskTypes[3]
         if (difficulty == null) difficulty = taskDifficulties[0]
         if (sound == null) sound = "Default"
     }
@@ -97,6 +99,19 @@ fun AlarmDisplay(
             Button(
                 onClick = {
                     if (task == "None") {
+                        alarmViewModel.cancelAlarm(
+                            updatedAlarm(
+                                id = id,
+                                day = day,
+                                hour = hour,
+                                minute = minute,
+                                task = task,
+                                roundCount = roundCount,
+                                difficulty = difficulty,
+                                sound = sound,
+                                snooze = snooze
+                                )
+                            )
                         if (enabled) {
                             alarmViewModel.setAlarm(
                                 updatedAlarm(
@@ -115,8 +130,12 @@ fun AlarmDisplay(
                         if (navController.previousBackStackEntry == null) {
                             (context as? Activity)?.finish()
                         } else {
-                            navController.popBackStack(AppScreen.AlarmScreen.name, inclusive = true)
+                            navController.navigate(AppScreen.MainScreen.name) {
+                                popUpTo(AppScreen.AlarmScreen.name) { inclusive = true }
+                            }
                         }
+                    } else {
+                        navController.navigate(TasksScreen.MemoryGame.name)
                     }
                 },
                 modifier = Modifier
@@ -146,12 +165,8 @@ fun AlarmDisplay(
                             )
                         )
                         Toast.makeText(context, "Alarm snoozed for 5 minutes", Toast.LENGTH_LONG).show()
-                        if (navController.previousBackStackEntry == null) {
-                            (context as? Activity)?.finish()
-                        } else {
-                            navController.navigate(AppScreen.MainScreen.name) {
-                                popUpTo(AppScreen.AlarmScreen.name) { inclusive = true }
-                            }
+                        navController.navigate(AppScreen.MainScreen.name) {
+                            popUpTo(AppScreen.AlarmScreen.name) { inclusive = true }
                         }
                     },
                     modifier = Modifier
@@ -171,7 +186,7 @@ fun updatedAlarm(
     day: Int,
     hour: Int,
     minute: Int,
-    task: String? = taskTypes[4],
+    task: String? = taskTypes[3],
     roundCount: Int,
     difficulty: String? = taskDifficulties[0],
     sound: String? = "Default",
