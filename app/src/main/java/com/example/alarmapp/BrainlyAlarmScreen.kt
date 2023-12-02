@@ -47,6 +47,7 @@ enum class TasksScreen(@StringRes val title: Int) {
 @Composable
 fun AlarmClockApp(
     alarmIntent: Intent,
+    stopAlarmSound: () -> Unit,
     navController: NavHostController = rememberNavController(),
     alarmDatabaseViewModel: AlarmDatabaseViewModel,
     modifier: Modifier = Modifier.fillMaxSize()
@@ -55,10 +56,10 @@ fun AlarmClockApp(
         mutableStateOf(alarmIntent.getBooleanExtra("alarmTriggered", false))
     }
 
+    val alarmSoundUri = alarmIntent.getStringExtra("sound")
+
     NavHost(
         navController = navController,
-        //startDestination = AppScreen.MainScreen.name,
-        //startDestination = AppScreen.AlarmScreen.name,
         startDestination = if (isAlarmTriggered.value) AppScreen.AlarmScreen.name else AppScreen.MainScreen.name,
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },
@@ -112,6 +113,7 @@ fun AlarmClockApp(
                 AlarmDisplay(
                     //alarmDatabaseViewModel = alarmDatabaseViewModel,
                     alarmIntent = alarmIntent,
+                    stopAlarmSound = stopAlarmSound,
                     context = LocalContext.current,
                     navController = navController
                 )

@@ -5,7 +5,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.ui.platform.LocalContext
@@ -14,20 +13,19 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.alarmapp.model.data.AlarmDatabaseViewModel
+import com.example.alarmapp.utils.AlarmSoundManager
 
 class MainActivity : ComponentActivity() {
+    private var soundManager: AlarmSoundManager? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         createNotificationChannel()
 
         val alarmIntent = intent
-        Log.d("debug MainActivity", "${intent?.getIntExtra("alarmId", 0)}")
+        soundManager = AlarmSoundManager(this)
 
         setContent {
-            //MemoryGame()
-            //PhoneShaking()
-            //MathEquation(difficulty = Difficulty.EASY)
-
             val owner = LocalViewModelStoreOwner.current
             owner?.let {
                 val alarmDatabaseViewModel: AlarmDatabaseViewModel = viewModel(
@@ -37,9 +35,18 @@ class MainActivity : ComponentActivity() {
                         LocalContext.current.applicationContext as Application
                     )
                 )
-                AlarmClockApp(alarmIntent, alarmDatabaseViewModel = alarmDatabaseViewModel)
+                AlarmClockApp(alarmIntent, {stopAlarmSound()}, alarmDatabaseViewModel = alarmDatabaseViewModel)
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        soundManager?.stopAlarmSound()
+    }
+
+    private fun stopAlarmSound() {
+        soundManager?.stopAlarmSound()
     }
 
     private fun createNotificationChannel() {

@@ -1,6 +1,5 @@
     package com.example.alarmapp.components.alarm
 
-    import android.app.Application
     import android.app.NotificationManager
     import android.app.PendingIntent
     import android.content.BroadcastReceiver
@@ -8,22 +7,17 @@
     import android.content.Intent
     import android.os.Build
     import android.util.Log
-    import android.widget.Toast
-    import androidx.compose.runtime.getValue
-    import androidx.compose.runtime.mutableIntStateOf
-    import androidx.compose.runtime.mutableStateOf
-    import androidx.compose.runtime.remember
-    import androidx.compose.runtime.setValue
     import androidx.core.app.NotificationCompat
     import com.example.alarmapp.MainActivity
     import com.example.alarmapp.R
-    import com.example.alarmapp.model.data.AlarmDatabaseViewModel
+    import com.example.alarmapp.utils.AlarmSoundManager
     import java.util.Calendar
 
     class AlarmReceiver: BroadcastReceiver() {
+        //private var alarmSound: Ringtone? = null
+        private var soundManager: AlarmSoundManager? = null
+
         override fun onReceive(context: Context?, intent: Intent?) {
-            //val alarmViewModel = AlarmViewModel(context)
-            //val alarmDatabaseViewModel = AlarmDatabaseViewModel(context.applicationContext as Application)
             val today = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
             val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
             val currentMinute = Calendar.getInstance().get(Calendar.MINUTE)
@@ -60,8 +54,6 @@
                     context, 0, alarmScreenIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
                 )
 
-                //Toast.makeText(context, "Alarm is triggered!!!", Toast.LENGTH_LONG).show()
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     val channelId = "brainly_alarm_id"
                     val notificationManager =
@@ -76,9 +68,33 @@
                         .setCategory(NotificationCompat.CATEGORY_ALARM)
                     notificationManager.notify(1, builder.build())
                 }
+
+                /*if (sound == null || (sound != null && sound == "Default")) {
+                    alarmSound = RingtoneManager.getRingtone(
+                        context, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+                    )
+                } else {
+                    sound?.let {
+                        alarmSound = RingtoneManager.getRingtone(
+                            context, Uri.parse(sound)
+                        )
+                    }
+                }
+                alarmSound?.isLooping = true
+                alarmSound?.play()*/
+
+                soundManager = AlarmSoundManager(context)
+                soundManager?.playAlarmSound(sound)
+
                 context?.startActivity(alarmScreenIntent)
             }
+
             val alarmId = intent?.getIntExtra("alarmId", -1) ?: return
             Log.d("debug AlarmReceiver:", "RECEIVED ALARM ID $alarmId: $day")
-            }
+        }
+
+        /*fun stopAlarmSound() {
+            alarmSound?.stop()
+            alarmSound = null
+        }*/
     }

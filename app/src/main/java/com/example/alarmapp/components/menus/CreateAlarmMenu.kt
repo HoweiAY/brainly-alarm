@@ -1,5 +1,7 @@
 package com.example.alarmapp.components.menus
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,12 +55,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.alarmapp.components.alarm.AlarmViewModel
+import com.example.alarmapp.components.menus.viewModels.CreateAlarmViewModel
 import com.example.alarmapp.model.data.Alarm
+import com.example.alarmapp.model.data.AlarmDatabaseViewModel
 import com.example.alarmapp.model.data.taskDifficulties
 import com.example.alarmapp.model.data.taskTypes
 import com.example.alarmapp.model.data.weekdays
-import com.example.alarmapp.model.data.AlarmDatabaseViewModel
-import com.example.alarmapp.components.menus.viewModels.CreateAlarmViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,12 +71,21 @@ fun CreateAlarmMenu(
     createAlarmViewModel: CreateAlarmViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-    val alarmViewModel = AlarmViewModel(LocalContext.current)
+    val context = LocalContext.current
+    val alarmViewModel = AlarmViewModel(context)
     val createAlarmUiState by createAlarmViewModel.uiState.collectAsState()
     var alarmLoaded by remember { mutableStateOf(false) }
-    var alarm by remember(alarmId) {
-        mutableStateOf<Alarm?>(null)
-    }
+    var alarm by remember(alarmId) { mutableStateOf<Alarm?>(null) }
+
+    var alarmSoundSelected by remember { mutableStateOf<String>("Default") }
+    val alarmPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            if (uri != null) {
+                alarmSoundSelected = createAlarmViewModel.updateSoundSelected(context, uri)
+            }
+        }
+    )
 
     LaunchedEffect(true) {
         alarmLoaded = false
@@ -94,8 +105,6 @@ fun CreateAlarmMenu(
         if (alarmId?.toInt() == alarm!!.id) alarmLoaded = true
         createAlarmViewModel.resetUiState(alarm)
     }
-
-
 
     if (alarmLoaded) {
 
@@ -322,7 +331,7 @@ fun CreateAlarmMenu(
                                     )
                                     Box(modifier = modifier.padding(start = 4.dp)) {
                                         Text(
-                                            text = createAlarmUiState.alarmSoundSelected,
+                                            text = alarmSoundSelected,
                                             fontSize = 14.sp,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
@@ -331,7 +340,7 @@ fun CreateAlarmMenu(
                                 }
                                 TextButton(
                                     modifier = modifier,
-                                    onClick = { /*TODO*/ }
+                                    onClick = { alarmPickerLauncher.launch("audio/*") }
                                 ) {
                                     Text(text = "Select", fontSize = 16.sp)
                                 }

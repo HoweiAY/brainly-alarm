@@ -1,5 +1,8 @@
 package com.example.alarmapp.components.menus.viewModels
 
+import android.content.Context
+import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.alarmapp.model.data.Alarm
@@ -102,10 +105,23 @@ class CreateAlarmViewModel(): ViewModel() {
         }
     }
 
-    fun updateSoundSelected(sound: String = "Default") {
-        _uiState.update { currentState ->
-            currentState.copy(alarmSoundSelected = sound)
+    fun updateSoundSelected(context: Context, soundUri: Uri): String {
+        var sound = "Default"
+        val cursor = context.contentResolver.query(soundUri, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val audioName = it.getString(
+                    it.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
+                )
+                sound = audioName
+            }
         }
+        _uiState.update { currentState ->
+            currentState.copy(
+                alarmSoundSelected = sound,
+            )
+        }
+        return sound
     }
 
     fun updateSnoozeEnabled(enabled: Boolean = true) {

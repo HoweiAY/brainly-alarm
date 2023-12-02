@@ -31,9 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.alarmapp.AlarmScreen
-import com.example.alarmapp.AppScreen
 import com.example.alarmapp.TasksScreen
 import com.example.alarmapp.model.data.Alarm
 import com.example.alarmapp.model.data.taskDifficulties
@@ -45,11 +42,14 @@ import java.util.Locale
 fun AlarmDisplay(
     //alarmDatabaseViewModel: AlarmDatabaseViewModel,
     alarmIntent: Intent,
+    stopAlarmSound: () -> Unit,
     context: Context = LocalContext.current,
     navController: NavController,
     modifier: Modifier = Modifier,
 ) {
-    val alarmViewModel = AlarmViewModel(LocalContext.current)
+    val context = LocalContext.current
+    val alarmViewModel = AlarmViewModel(context)
+    val alarmReceiver = AlarmReceiver()
 
     var id by remember { mutableIntStateOf(alarmIntent.getIntExtra("alarmId", 0)) }
     var day by remember { mutableIntStateOf(alarmIntent.getIntExtra("dayOfWeek", 1)) }
@@ -99,6 +99,7 @@ fun AlarmDisplay(
             Button(
                 onClick = {
                     if (task == "None") {
+                        stopAlarmSound()
                         alarmViewModel.cancelAlarm(
                             updatedAlarm(
                                 id = id,
@@ -127,13 +128,7 @@ fun AlarmDisplay(
                                 )
                             )
                         }
-                        if (navController.previousBackStackEntry == null) {
-                            (context as? Activity)?.finish()
-                        } else {
-                            navController.navigate(AppScreen.MainScreen.name) {
-                                popUpTo(AppScreen.AlarmScreen.name) { inclusive = true }
-                            }
-                        }
+                        (context as? Activity)?.finish()
                     } else {
                         navController.navigate(TasksScreen.MemoryGame.name)
                     }
@@ -150,6 +145,7 @@ fun AlarmDisplay(
                 Spacer(modifier = modifier.height(30.dp))
                 Button(
                     onClick = {
+                        stopAlarmSound()
                         val snoozeMinute = Calendar.getInstance().get(Calendar.MINUTE) + 5
                         val snoozeAlarm = alarmViewModel.setAlarm(
                             updatedAlarm(
@@ -165,9 +161,7 @@ fun AlarmDisplay(
                             )
                         )
                         Toast.makeText(context, "Alarm snoozed for 5 minutes", Toast.LENGTH_LONG).show()
-                        navController.navigate(AppScreen.MainScreen.name) {
-                            popUpTo(AppScreen.AlarmScreen.name) { inclusive = true }
-                        }
+                        (context as? Activity)?.finish()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -227,5 +221,5 @@ fun updatedAlarm(
 @Preview(showBackground = true)
 @Composable
 fun AlarmDisplayPreview() {
-    AlarmDisplay(Intent(), navController = rememberNavController())
+    //AlarmDisplay(Intent(), navController = rememberNavController())
 }
