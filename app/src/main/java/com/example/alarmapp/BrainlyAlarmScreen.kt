@@ -120,7 +120,7 @@ fun AlarmClockApp(
             }
 
             composable(route = TasksScreen.MemoryGame.name) {
-                MemoryGame(gridSize = 3)
+                MemoryGame("Easy", 2)
             }
         }
     }

@@ -12,6 +12,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.alarmapp.components.games.MemoryGame
+import com.example.alarmapp.components.missions.MathEquation
+import com.example.alarmapp.components.tasks.PhoneShaking
 import com.example.alarmapp.model.data.AlarmDatabaseViewModel
 import com.example.alarmapp.utils.AlarmSoundManager
 
