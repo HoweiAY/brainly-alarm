@@ -13,6 +13,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.alarmapp.components.games.MemoryGame
+import com.example.alarmapp.components.missions.MathEquation
+import com.example.alarmapp.components.tasks.PhoneShaking
 import com.example.alarmapp.model.data.AlarmDatabaseViewModel
 
 class MainActivity : ComponentActivity() {
@@ -24,9 +27,9 @@ class MainActivity : ComponentActivity() {
         Log.d("debug MainActivity", "${intent?.getIntExtra("alarmId", 0)}")
 
         setContent {
-            //MemoryGame()
+            //MemoryGame(difficulty = "Easy", rounds = 2)
             //PhoneShaking()
-            //MathEquation(difficulty = Difficulty.EASY)
+            //MathEquation(difficulty = "Hard")
 
             val owner = LocalViewModelStoreOwner.current
             owner?.let {
