@@ -176,10 +176,12 @@ class HomeViewModel: ViewModel() {
                 else alarmMinute - currentMinute
 
             var nextAlarmHour = when {
-                currentHour == alarmHour -> {
-                    if (currentDay == alarmDay && currentMinute > alarmMinute) 23 else 0
-                }
-
+                currentHour == alarmHour ->
+                    if (currentDay == alarmDay && currentMinute > alarmMinute) 23
+                    else {
+                        if (currentMinute > alarmMinute) 23
+                        else 0
+                    }
                 else -> {
                     if (currentHour > alarmHour) {
                         if (currentMinute > alarmMinute) 24 - abs(currentHour - alarmHour) - 1
@@ -248,8 +250,11 @@ class HomeViewModel: ViewModel() {
                 else alarmMinute - currentMinute
 
             val hourDifference = when {
-                currentHour == alarmHour -> {
-                    if (currentDay == alarmDay && currentMinute > alarmMinute) 23 else 0
+                currentHour == alarmHour ->
+                    if (currentDay == alarmDay && currentMinute > alarmMinute) 23
+                    else {
+                        if (currentMinute > alarmMinute) 23
+                        else 0
                     }
                 else -> {
                     if (currentHour > alarmHour) {
