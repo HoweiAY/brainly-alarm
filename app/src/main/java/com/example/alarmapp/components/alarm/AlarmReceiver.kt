@@ -32,6 +32,7 @@
             val sound = intent?.getStringExtra("sound")
             val snooze = intent?.getBooleanExtra("snooze", true)
             val enabled = intent?.getBooleanExtra("enabled", true)
+            val isSnoozed = intent?.getBooleanExtra("isSnoozed", false)
 
             if (today == day && hour == currentHour && minute == currentMinute) {
                 val alarmScreenIntent = Intent(context, MainActivity::class.java)
@@ -46,11 +47,10 @@
                 alarmScreenIntent.putExtra("sound", sound)
                 alarmScreenIntent.putExtra("snooze", snooze)
                 alarmScreenIntent.putExtra("enabled", enabled)
+                alarmScreenIntent.putExtra("isSnoozed", isSnoozed)
                 alarmScreenIntent.putExtra("alarmTriggered", true)
 
                 alarmScreenIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
-                context?.startActivity(alarmScreenIntent)
 
                 val pendingIntent = PendingIntent.getActivity(
                     context, 0, alarmScreenIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
@@ -74,6 +74,7 @@
                 soundManager = AlarmSoundManager.getInstance(context)
                 soundManager?.playAlarmSound(sound)
 
+                context?.startActivity(alarmScreenIntent)
             }
 
             val alarmId = intent?.getIntExtra("alarmId", -1) ?: return

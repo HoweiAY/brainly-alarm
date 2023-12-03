@@ -62,8 +62,6 @@ fun BrainlyAlarmApp (
         mutableStateOf(alarmIntent.getBooleanExtra("alarmTriggered", false))
     }
 
-    val alarmSoundUri = alarmIntent.getStringExtra("sound")
-
     NavHost(
         navController = navController,
         startDestination = if (isAlarmTriggered.value) AppScreen.AlarmScreen.name else AppScreen.MainScreen.name,
@@ -121,6 +119,7 @@ fun BrainlyAlarmApp (
                     alarmIntent = alarmIntent,
                     stopAlarmSound = stopAlarmSound,
                     context = context,
+                    alarmDatabaseViewModel = alarmDatabaseViewModel,
                     navController = navController
                 )
             }

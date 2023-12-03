@@ -75,7 +75,7 @@ fun CreateAlarmMenu(
     val alarmViewModel = AlarmViewModel(context.applicationContext)
     val createAlarmUiState by createAlarmViewModel.uiState.collectAsState()
     var alarmLoaded by remember { mutableStateOf(false) }
-    var alarm by remember(alarmId) { mutableStateOf<Alarm?>(null) }
+    var alarm by remember { mutableStateOf<Alarm?>(null) }
 
     var alarmSoundSelected by remember { mutableStateOf<String>("Default") }
     val alarmPickerLauncher = rememberLauncherForActivityResult(

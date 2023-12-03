@@ -12,7 +12,7 @@ import java.util.Calendar
 
 class AlarmViewModel(private val context: Context): ViewModel() {
     @SuppressLint("ScheduleExactAlarm")
-    fun setAlarm(alarm: Alarm) {
+    fun setAlarm(alarm: Alarm, reset: Boolean = false, snoozed: Boolean = false) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmId = alarm.id
 
@@ -22,7 +22,6 @@ class AlarmViewModel(private val context: Context): ViewModel() {
         for (dayOfWeek in daysOfWeek) {
             val calendar = Calendar.getInstance()
             calendar.timeInMillis = System.currentTimeMillis()
-            //calendar.set(Calendar.DAY_OF_WEEK, dayOfWeek)
             calendar.set(Calendar.HOUR_OF_DAY, alarm.hour)
             calendar.set(Calendar.MINUTE, alarm.minute)
             calendar.set(Calendar.SECOND, 0)
@@ -43,6 +42,7 @@ class AlarmViewModel(private val context: Context): ViewModel() {
             intent.putExtra("sound", alarm.sound)
             intent.putExtra("snooze", alarm.snooze)
             intent.putExtra("enabled", alarm.enabled)
+            intent.putExtra("isSnoozed", snoozed)
             intent.putExtra("alarmTriggered", true)
 
             val requestCode = getPendingIntentRequestCode(alarmId, dayOfWeek)
@@ -53,7 +53,9 @@ class AlarmViewModel(private val context: Context): ViewModel() {
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
 
-            val alarmTimeInMillis = calendar.timeInMillis
+            var alarmTimeInMillis = calendar.timeInMillis
+            if (reset) alarmTimeInMillis += (7 * 24 * 60 * 60 * 1000)
+            if (snoozed) alarmTimeInMillis -= (5 * 60 * 1000)
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent)
 
             Log.d("debug set alarm:", "alarm set: $alarmId - $requestCode")

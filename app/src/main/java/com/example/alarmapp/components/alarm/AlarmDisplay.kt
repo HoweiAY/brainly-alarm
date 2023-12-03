@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.alarmapp.TasksScreen
 import com.example.alarmapp.model.data.Alarm
+import com.example.alarmapp.model.data.AlarmDatabaseViewModel
 import com.example.alarmapp.model.data.taskDifficulties
 import com.example.alarmapp.model.data.taskTypes
 import java.util.Calendar
@@ -40,15 +42,15 @@ import java.util.Locale
 
 @Composable
 fun AlarmDisplay(
-    //alarmDatabaseViewModel: AlarmDatabaseViewModel,
     alarmIntent: Intent,
     stopAlarmSound: () -> Unit,
     context: Context = LocalContext.current,
+    alarmDatabaseViewModel: AlarmDatabaseViewModel,
     navController: NavController,
     modifier: Modifier = Modifier,
 ) {
     val alarmViewModel = AlarmViewModel(context)
-    val alarmReceiver = AlarmReceiver()
+    var alarm by remember { mutableStateOf<Alarm?>(null) }
 
     var id by remember { mutableIntStateOf(alarmIntent.getIntExtra("alarmId", 0)) }
     var day by remember { mutableIntStateOf(alarmIntent.getIntExtra("dayOfWeek", 1)) }
@@ -60,6 +62,12 @@ fun AlarmDisplay(
     var sound by remember { mutableStateOf(alarmIntent.getStringExtra("sound")) }
     var snooze by remember { mutableStateOf(alarmIntent.getBooleanExtra("snooze", true)) }
     var enabled by remember { mutableStateOf(alarmIntent.getBooleanExtra("enabled", true)) }
+    var isSnoozed by remember { mutableStateOf(alarmIntent.getBooleanExtra("isSnoozed", false)) }
+
+    alarmDatabaseViewModel.getAlarmById(id)
+    alarmDatabaseViewModel.foundAlarm.observeAsState().value?.let { foundAlarm ->
+        alarm = foundAlarm
+    }
 
     LaunchedEffect(Unit) {
         if (task == null) task = taskTypes[3]
@@ -97,34 +105,21 @@ fun AlarmDisplay(
         ) {
             Button(
                 onClick = {
-                    alarmViewModel.cancelAlarm(
-                        updatedAlarm(
-                            id = id,
-                            day = day,
-                            hour = hour,
-                            minute = minute,
-                            task = task,
-                            roundCount = roundCount,
-                            difficulty = difficulty,
-                            sound = sound,
-                            snooze = snooze
-                        )
+                    resetAlarm(
+                        id = id,
+                        day = day,
+                        hour = hour,
+                        minute = minute,
+                        task = task,
+                        roundCount = roundCount,
+                        difficulty = difficulty,
+                        sound = sound,
+                        snooze = snooze,
+                        enabled = enabled,
+                        isSnoozed = isSnoozed,
+                        alarmViewModel = alarmViewModel
                     )
-                    if (enabled) {
-                        alarmViewModel.setAlarm(
-                            updatedAlarm(
-                                id = id,
-                                day = day,
-                                hour = hour,
-                                minute = minute,
-                                task = task,
-                                roundCount = roundCount,
-                                difficulty = difficulty,
-                                sound = sound,
-                                snooze = snooze
-                            )
-                        )
-                    }
+                    if (alarm != null) alarmDatabaseViewModel.updateAlarm(alarm!!)
                     if (task == taskTypes[3]) {
                         stopAlarmSound()
                         (context as? Activity)?.finish()
@@ -156,6 +151,20 @@ fun AlarmDisplay(
                 Button(
                     onClick = {
                         stopAlarmSound()
+                        alarmViewModel.cancelAlarm(
+                            updatedAlarm(
+                                id = id,
+                                day = day,
+                                hour = hour,
+                                minute = minute,
+                                task = task,
+                                roundCount = roundCount,
+                                difficulty = difficulty,
+                                sound = sound,
+                                snooze = snooze
+                            )
+                        )
+                        if (alarm != null) alarmDatabaseViewModel.updateAlarm(alarm!!)
                         val snoozeMinute = Calendar.getInstance().get(Calendar.MINUTE) + 5
                         val snoozeAlarm = alarmViewModel.setAlarm(
                             updatedAlarm(
@@ -168,7 +177,8 @@ fun AlarmDisplay(
                                 difficulty = difficulty,
                                 sound = sound,
                                 snooze = snooze
-                            )
+                            ),
+                            snoozed = true
                         )
                         Toast.makeText(context, "Alarm snoozed for 5 minutes", Toast.LENGTH_LONG).show()
                         (context as? Activity)?.finish()
@@ -182,6 +192,52 @@ fun AlarmDisplay(
                 }
             }
         }
+    }
+}
+
+fun resetAlarm(
+    id: Int,
+    day: Int,
+    hour: Int,
+    minute: Int,
+    task: String? = taskTypes[3],
+    roundCount: Int,
+    difficulty: String? = taskDifficulties[0],
+    sound: String? = "Default",
+    snooze: Boolean = true,
+    enabled: Boolean = false,
+    isSnoozed: Boolean = false,
+    alarmViewModel: AlarmViewModel,
+) {
+    alarmViewModel.cancelAlarm(
+        updatedAlarm(
+            id = id,
+            day = day,
+            hour = hour,
+            minute = minute,
+            task = task,
+            roundCount = roundCount,
+            difficulty = difficulty,
+            sound = sound,
+            snooze = snooze
+        )
+    )
+    if (enabled) {
+        alarmViewModel.setAlarm(
+            updatedAlarm(
+                id = id,
+                day = day,
+                hour = hour,
+                minute = minute,
+                task = task,
+                roundCount = roundCount,
+                difficulty = difficulty,
+                sound = sound,
+                snooze = snooze
+            ),
+            reset = true,
+            snoozed = isSnoozed
+        )
     }
 }
 

@@ -48,9 +48,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.alarmapp.AlarmScreen
 import com.example.alarmapp.components.alarm.AlarmViewModel
-import com.example.alarmapp.ui.AlarmCard
-import com.example.alarmapp.model.data.AlarmDatabaseViewModel
 import com.example.alarmapp.components.menus.viewModels.HomeViewModel
+import com.example.alarmapp.model.data.AlarmDatabaseViewModel
+import com.example.alarmapp.ui.AlarmCard
 import kotlinx.coroutines.delay
 
 @Composable
@@ -68,10 +68,10 @@ fun HomeMenu(
     var currentMinute by remember { mutableIntStateOf(Calendar.getInstance().get(Calendar.MINUTE)) }
 
     LaunchedEffect(Unit) {
-        alarmData.forEach { alarm ->
+        /*alarmData.forEach { alarm ->
             homeViewModel.toggleAlarmEnabled(alarm, alarm.enabled)
             if (alarm.enabled) alarmViewModel.setAlarm(alarm) else alarmViewModel.cancelAlarm(alarm)
-        }
+        }*/
         while (true) {
             val nextMinute = Calendar.getInstance().get(Calendar.MINUTE)
             if (currentMinute != nextMinute) {

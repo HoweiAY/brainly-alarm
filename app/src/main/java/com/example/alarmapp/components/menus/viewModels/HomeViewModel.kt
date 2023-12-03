@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.lang.StringBuilder
 import kotlin.math.abs
 
 class HomeViewModel: ViewModel() {
@@ -114,10 +113,13 @@ class HomeViewModel: ViewModel() {
     }
 
     fun updateNextAlarmMsg(alarmData: List<Alarm>) {
-        val nextAlarmDay = _uiState.value.nextAlarmDay
+        var nextAlarmDay = _uiState.value.nextAlarmDay
         val nextAlarmHour = _uiState.value.nextAlarmHour
         val nextAlarmMinute = _uiState.value.nextAlarmMinute
 
+        if (alarmData.isNotEmpty() && nextAlarmDay == 0 && nextAlarmHour == 0 && nextAlarmMinute == 0) {
+            nextAlarmDay = 7
+        }
         val nextAlarmMsg = if (alarmData.isNotEmpty())
             StringBuilder()
                 .append("Next alarm in ")
