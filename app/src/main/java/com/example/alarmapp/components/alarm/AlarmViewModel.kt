@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.alarmapp.MainActivity
 import com.example.alarmapp.model.data.Alarm
 import java.util.Calendar
 
@@ -79,6 +80,13 @@ class AlarmViewModel(private val context: Context): ViewModel() {
 
             Log.d("debug cancel alarm:", "alarm cancelled: $alarmId")
         }
+    }
+
+    fun onAlarmDismissed(context: Context?) {
+        val intent = Intent(context, MainActivity::class.java)
+        intent.putExtra("alarmTriggered", false)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        context?.startActivity(intent)
     }
 
     private fun getPendingIntentRequestCode(alarmId: Int, dayOfWeek: Int): Int {

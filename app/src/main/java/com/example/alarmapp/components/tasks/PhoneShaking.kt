@@ -1,6 +1,5 @@
 package com.example.alarmapp.components.tasks
 
-import android.app.Activity
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -30,12 +29,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.alarmapp.R
+import com.example.alarmapp.components.alarm.AlarmViewModel
 
 @Composable
 fun PhoneShaking(
-    context: Context = LocalContext.current,
+    context: Context = LocalContext.current.applicationContext,
     stopAlarmSound: () -> Unit,
 ) {
+    val alarmViewModel = AlarmViewModel(context)
     var remainingShakeTime by remember { mutableIntStateOf((15..30).random()) }
 
     val sensorManager = LocalContext.current.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -48,7 +49,8 @@ fun PhoneShaking(
 
     fun handleTaskCompleted(){
         stopAlarmSound()
-        (context as? Activity)?.finish()
+        alarmViewModel.onAlarmDismissed(context)
+        //(context as? Activity)?.finish()
     }
 
     val sensorEventListener = object : SensorEventListener {

@@ -44,7 +44,7 @@ import java.util.Locale
 fun AlarmDisplay(
     alarmIntent: Intent,
     stopAlarmSound: () -> Unit,
-    context: Context = LocalContext.current,
+    context: Context = LocalContext.current.applicationContext,
     alarmDatabaseViewModel: AlarmDatabaseViewModel,
     navController: NavController,
     modifier: Modifier = Modifier,
@@ -123,6 +123,7 @@ fun AlarmDisplay(
                     if (task == taskTypes[3]) {
                         stopAlarmSound()
                         (context as? Activity)?.finish()
+                        //alarmViewModel.onAlarmDismissed(context)
                     } else {
                         when (task) {
                             taskTypes[0] -> navController.navigate(
@@ -134,7 +135,10 @@ fun AlarmDisplay(
                             taskTypes[2] -> navController.navigate(
                                 TasksScreen.PhoneShaking.name
                             )
-                            else -> { (context as? Activity)?.finish() }
+                            else -> {
+                                //alarmViewModel.onAlarmDismissed(context)
+                                (context as? Activity)?.finish()
+                            }
                         }
                     }
                 },

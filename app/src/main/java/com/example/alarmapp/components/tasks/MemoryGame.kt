@@ -1,6 +1,5 @@
 package com.example.alarmapp.components.tasks
 
-import android.app.Activity
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -30,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.alarmapp.components.alarm.AlarmViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 fun MemoryGame(
     difficulty: String,
     rounds: Int,
-    context: Context = LocalContext.current,
+    context: Context = LocalContext.current.applicationContext,
     stopAlarmSound: () -> Unit,
 ){
     TileBoard(difficulty, rounds, context, stopAlarmSound)
@@ -56,9 +56,10 @@ enum class TileState{
 private fun TileBoard(
     difficulty: String = "Easy",
     rounds: Int = 1,
-    context: Context = LocalContext.current,
+    context: Context = LocalContext.current.applicationContext,
     stopAlarmSound: () -> Unit,
 ) {
+    val alarmViewModel = AlarmViewModel(context)
     val gridSize = when(difficulty){
         "Easy" -> 3
         "Normal" -> 3
@@ -105,7 +106,8 @@ private fun TileBoard(
 
     fun handleTaskCompleted() {
         stopAlarmSound()
-        (context as? Activity)?.finish()
+        alarmViewModel.onAlarmDismissed(context)
+        //(context as? Activity)?.finish()
     }
 
     suspend fun handleWrongTileClick(index: Int) {

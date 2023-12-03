@@ -55,9 +55,9 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun HomeMenu(
+    homeViewModel: HomeViewModel = viewModel(),
     alarmDatabaseViewModel: AlarmDatabaseViewModel,
     navController: NavHostController,
-    homeViewModel: HomeViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
     val alarmViewModel = AlarmViewModel(LocalContext.current)
@@ -68,10 +68,6 @@ fun HomeMenu(
     var currentMinute by remember { mutableIntStateOf(Calendar.getInstance().get(Calendar.MINUTE)) }
 
     LaunchedEffect(Unit) {
-        /*alarmData.forEach { alarm ->
-            homeViewModel.toggleAlarmEnabled(alarm, alarm.enabled)
-            if (alarm.enabled) alarmViewModel.setAlarm(alarm) else alarmViewModel.cancelAlarm(alarm)
-        }*/
         while (true) {
             val nextMinute = Calendar.getInstance().get(Calendar.MINUTE)
             if (currentMinute != nextMinute) {

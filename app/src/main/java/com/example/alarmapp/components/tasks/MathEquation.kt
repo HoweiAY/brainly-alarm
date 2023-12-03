@@ -1,6 +1,5 @@
 package com.example.alarmapp.components.tasks
 
-import android.app.Activity
 import android.content.Context
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.alarmapp.components.alarm.AlarmViewModel
 import kotlinx.coroutines.delay
 import net.objecthunter.exp4j.ExpressionBuilder
 
@@ -47,9 +47,11 @@ import net.objecthunter.exp4j.ExpressionBuilder
 fun MathEquation(
     difficulty: String = "Easy",
     rounds: Int = 1,
-    context: Context = LocalContext.current,
+    context: Context = LocalContext.current.applicationContext,
     stopAlarmSound: () -> Unit,
 ) {
+    val alarmViewModel = AlarmViewModel(context)
+
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val desiredWidth = with(LocalDensity.current) { screenWidth * 0.8f }
 
@@ -60,7 +62,8 @@ fun MathEquation(
 
     fun handleTaskCompleted(){
         stopAlarmSound()
-        (context as? Activity)?.finish()
+        alarmViewModel.onAlarmDismissed(context)
+        //(context as? Activity)?.finish()
     }
 
     LaunchedEffect(isCorrect) {

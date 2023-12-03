@@ -50,15 +50,14 @@ class HomeViewModel: ViewModel() {
     }
 
     fun toggleAlarmEnabled(alarm: Alarm, enable: Boolean = true) {
-        val alarmsEnabled = _uiState.value.enabledAlarms
-        if (enable && !alarmsEnabled.contains(alarm)) {
-            alarmsEnabled.add(alarm)
+        val enabledAlarms = _uiState.value.enabledAlarms
+        val updatedEnabledAlarms = mutableListOf<Alarm>()
+        for (enabledAlarm in enabledAlarms) {
+            if (alarm.id != enabledAlarm.id) updatedEnabledAlarms.add(enabledAlarm)
         }
-        else if (!enable && alarmsEnabled.contains(alarm)) {
-            alarmsEnabled.remove(alarm)
-        }
+        if (enable) updatedEnabledAlarms.add(alarm)
         _uiState.update { currentState ->
-            currentState.copy(enabledAlarms = alarmsEnabled, enableAlarmChanged = !_uiState.value.enableAlarmChanged)
+            currentState.copy(enabledAlarms = updatedEnabledAlarms, enableAlarmChanged = !_uiState.value.enableAlarmChanged)
         }
         updateNextAlarm(uiState.value.enabledAlarms)
         Log.i("debug toggleAlarmEnabled", "toggleAlarmEnabled: ${_uiState.value.enabledAlarms}")
@@ -117,9 +116,6 @@ class HomeViewModel: ViewModel() {
         val nextAlarmHour = _uiState.value.nextAlarmHour
         val nextAlarmMinute = _uiState.value.nextAlarmMinute
 
-        if (alarmData.isNotEmpty() && nextAlarmDay == 0 && nextAlarmHour == 0 && nextAlarmMinute == 0) {
-            nextAlarmDay = 7
-        }
         val nextAlarmMsg = if (alarmData.isNotEmpty())
             StringBuilder()
                 .append("Next alarm in ")
@@ -169,57 +165,63 @@ class HomeViewModel: ViewModel() {
             }
         }
 
-        val nextAlarmCalendar = nextAlarmCalendar(calendar, alarmCalendars)
-        val alarmDay = nextAlarmCalendar.get(Calendar.DAY_OF_WEEK)
-        val alarmHour = nextAlarmCalendar.get(Calendar.HOUR_OF_DAY)
-        val alarmMinute = nextAlarmCalendar.get(Calendar.MINUTE)
+        if (alarmCalendars.isNotEmpty()) {
+            val nextAlarmCalendar = nextAlarmCalendar(calendar, alarmCalendars)
+            val alarmDay = nextAlarmCalendar.get(Calendar.DAY_OF_WEEK)
+            val alarmHour = nextAlarmCalendar.get(Calendar.HOUR_OF_DAY)
+            val alarmMinute = nextAlarmCalendar.get(Calendar.MINUTE)
 
-        var nextAlarmMinute =
-            if (currentMinute > alarmMinute) 60 - currentMinute + alarmMinute
-            else alarmMinute - currentMinute
+            var nextAlarmMinute =
+                if (currentMinute > alarmMinute) 60 - currentMinute + alarmMinute
+                else alarmMinute - currentMinute
 
-        var nextAlarmHour = when {
-            currentHour == alarmHour -> {
-                if (currentDay == alarmDay && currentMinute > alarmMinute) 23 else 0
-            }
-            else -> {
-                if (currentHour > alarmHour) {
-                    if (currentMinute > alarmMinute) 24 - abs(currentHour - alarmHour) - 1
-                    else 24 - abs(currentHour - alarmHour)
-                } else {
-                    if (currentMinute > alarmMinute) alarmHour - currentHour - 1
-                    else alarmHour - currentHour
+            var nextAlarmHour = when {
+                currentHour == alarmHour -> {
+                    if (currentDay == alarmDay && currentMinute > alarmMinute) 23 else 0
+                }
+
+                else -> {
+                    if (currentHour > alarmHour) {
+                        if (currentMinute > alarmMinute) 24 - abs(currentHour - alarmHour) - 1
+                        else 24 - abs(currentHour - alarmHour)
+                    } else {
+                        if (currentMinute > alarmMinute) alarmHour - currentHour - 1
+                        else alarmHour - currentHour
+                    }
                 }
             }
-        }
 
-        var nextAlarmDay = when {
-            currentDay == alarmDay -> {
-                if (currentHour > alarmHour ||
-                    (currentHour == alarmHour && currentMinute > alarmMinute)
+            var nextAlarmDay = when {
+                currentDay == alarmDay -> {
+                    if (currentHour > alarmHour ||
+                        (currentHour == alarmHour && currentMinute > alarmMinute)
                     ) 6 else 0
-            }
-            currentDay > alarmDay -> {
-                if (currentHour > alarmHour ||
-                    (currentHour == alarmHour && currentMinute > alarmMinute)
-                    ) {
-                    7 - abs(currentDay - alarmDay) - 1
-                } else 7 - abs(currentDay - alarmDay)
-            }
-            else -> {
-                if (currentHour > alarmHour ||
-                    (currentHour == alarmHour && currentMinute > alarmMinute)
-                    ) { alarmDay - currentDay - 1
-                } else alarmDay - currentDay
-            }
-        }
+                }
 
-        _uiState.update { currentState ->
-            currentState.copy(
-                nextAlarmDay = nextAlarmDay,
-                nextAlarmHour = nextAlarmHour,
-                nextAlarmMinute = nextAlarmMinute
-            )
+                currentDay > alarmDay -> {
+                    if (currentHour > alarmHour ||
+                        (currentHour == alarmHour && currentMinute > alarmMinute)
+                    ) {
+                        7 - abs(currentDay - alarmDay) - 1
+                    } else 7 - abs(currentDay - alarmDay)
+                }
+
+                else -> {
+                    if (currentHour > alarmHour ||
+                        (currentHour == alarmHour && currentMinute > alarmMinute)
+                    ) {
+                        alarmDay - currentDay - 1
+                    } else alarmDay - currentDay
+                }
+            }
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    nextAlarmDay = nextAlarmDay,
+                    nextAlarmHour = nextAlarmHour,
+                    nextAlarmMinute = nextAlarmMinute
+                )
+            }
         }
         updateNextAlarmMsg(_uiState.value.enabledAlarms)
     }
