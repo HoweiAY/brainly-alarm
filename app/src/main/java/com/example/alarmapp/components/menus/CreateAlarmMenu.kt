@@ -1,6 +1,7 @@
 package com.example.alarmapp.components.menus
 
 import android.content.Context
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -78,12 +79,15 @@ fun CreateAlarmMenu(
     var alarm by remember { mutableStateOf<Alarm?>(null) }
 
     var alarmSoundSelected by remember { mutableStateOf<String>("Default") }
+    var alarmSoundUri by remember { mutableStateOf<String>("Default") }
     val alarmPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             if (uri != null) {
                 alarmSoundSelected = createAlarmViewModel.updateSoundSelected(context, uri)
+                alarmSoundUri = uri.toString()
             }
+            Log.d("debug alarm sound: ", "debug alarm sound: $alarmSoundUri")
         }
     )
 
@@ -402,7 +406,7 @@ fun CreateAlarmMenu(
                             alarm!!.task = createAlarmUiState.taskSelected
                             alarm!!.difficulty = createAlarmUiState.difficultySelected
                             alarm!!.rounds = createAlarmUiState.roundsSelected
-                            alarm!!.sound = createAlarmUiState.alarmSoundSelected
+                            alarm!!.sound = createAlarmUiState.alarmSoundUri
                             alarm!!.snooze = createAlarmUiState.snoozeEnabled
                             alarmDatabaseViewModel.updateAlarm(alarm!!)
                             alarmViewModel.setAlarm(alarm!!)
@@ -415,7 +419,7 @@ fun CreateAlarmMenu(
                                 task = createAlarmUiState.taskSelected,
                                 difficulty = createAlarmUiState.difficultySelected,
                                 rounds = createAlarmUiState.roundsSelected,
-                                sound = createAlarmUiState.alarmSoundSelected,
+                                sound = createAlarmUiState.alarmSoundUri,
                                 snooze = createAlarmUiState.snoozeEnabled,
                                 enabled = true,
                             )

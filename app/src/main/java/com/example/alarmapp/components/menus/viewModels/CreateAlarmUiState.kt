@@ -14,6 +14,7 @@ data class CreateAlarmUiState(
     val roundsSelected: Int = 1,
     val difficultySelected: String = taskDifficulties[0],
     val alarmSoundSelected: String = "Default",
+    val alarmSoundUri: String = "Default",
     val snoozeEnabled: Boolean = true,
 
     var taskSelectorExpanded: Boolean = false,

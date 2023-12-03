@@ -119,6 +119,7 @@ class CreateAlarmViewModel(): ViewModel() {
         _uiState.update { currentState ->
             currentState.copy(
                 alarmSoundSelected = sound,
+                alarmSoundUri = soundUri.toString()
             )
         }
         return sound

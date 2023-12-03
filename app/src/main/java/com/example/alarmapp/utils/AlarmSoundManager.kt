@@ -33,6 +33,7 @@ class AlarmSoundManager private constructor (private val context: Context?) {
                         context, Uri.parse(sound)
                     )
                 }
+                Log.d("debug playAlarmSound: ", "set alarmSound: %%%%$sound")
             }
         }
         alarmSound?.isLooping = true
