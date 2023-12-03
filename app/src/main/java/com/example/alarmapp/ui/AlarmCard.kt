@@ -112,7 +112,7 @@ fun AlarmCard(
                         alarmDatabaseViewModel.updateAlarm(alarm)
                         alarmEnabled = alarm.enabled
                         if (alarm.enabled) alarmViewModel.setAlarm(alarm)
-                        else alarmViewModel.cancelAlarm(alarm)
+                        else alarmViewModel.cancelAlarm(alarm, isSnoozed = false)
                         homeViewModel.updateNextAlarm(homeUiState.enabledAlarms)
                     },
                     modifier = Modifier

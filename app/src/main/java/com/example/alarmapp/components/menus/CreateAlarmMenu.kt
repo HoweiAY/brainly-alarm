@@ -395,7 +395,7 @@ fun CreateAlarmMenu(
                             if (createAlarmUiState.weekdaysSelected.isEmpty()) weekdays
                             else createAlarmUiState.weekdaysSelected
                         if (alarm != null) {
-                            alarmViewModel.cancelAlarm(alarm!!)
+                            alarmViewModel.cancelAlarm(alarm!!, isSnoozed = false)
                             alarm!!.days = alarmDays
                             alarm!!.hour = timePickerState.hour
                             alarm!!.minute = timePickerState.minute

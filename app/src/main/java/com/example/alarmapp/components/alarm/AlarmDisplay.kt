@@ -1,8 +1,8 @@
 package com.example.alarmapp.components.alarm
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +37,7 @@ import com.example.alarmapp.model.data.Alarm
 import com.example.alarmapp.model.data.AlarmDatabaseViewModel
 import com.example.alarmapp.model.data.taskDifficulties
 import com.example.alarmapp.model.data.taskTypes
+import kotlinx.coroutines.delay
 import java.util.Calendar
 import java.util.Locale
 
@@ -64,9 +65,24 @@ fun AlarmDisplay(
     var enabled by remember { mutableStateOf(alarmIntent.getBooleanExtra("enabled", true)) }
     var isSnoozed by remember { mutableStateOf(alarmIntent.getBooleanExtra("isSnoozed", false)) }
 
+    var displayHour by remember { mutableIntStateOf(hour) }
+    var displayMinute by remember { mutableIntStateOf(minute) }
+
     alarmDatabaseViewModel.getAlarmById(id)
     alarmDatabaseViewModel.foundAlarm.observeAsState().value?.let { foundAlarm ->
         alarm = foundAlarm
+    }
+
+    LaunchedEffect(Unit) {
+        val initialTime = Calendar.getInstance()
+        while (true) {
+            val currentTime = Calendar.getInstance()
+            if (currentTime.get(Calendar.MINUTE) != initialTime.get(Calendar.MINUTE)) {
+                displayHour = currentTime.get(Calendar.HOUR_OF_DAY)
+                displayMinute = currentTime.get(Calendar.MINUTE)
+            }
+            delay(1000)
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -86,8 +102,8 @@ fun AlarmDisplay(
             modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val hourString = String.format(Locale.getDefault(), "%02d", hour)
-            val minuteString = String.format(Locale.getDefault(), "%02d", minute)
+            val hourString = String.format(Locale.getDefault(), "%02d", displayHour)
+            val minuteString = String.format(Locale.getDefault(), "%02d", displayMinute)
             Text(
                 text = "Time to wake up!",
                 fontSize = 24.sp,
@@ -116,14 +132,14 @@ fun AlarmDisplay(
                         sound = sound,
                         snooze = snooze,
                         enabled = enabled,
-                        isSnoozed = isSnoozed,
+                        isSnoozed = false,
                         alarmViewModel = alarmViewModel
                     )
                     if (alarm != null) alarmDatabaseViewModel.updateAlarm(alarm!!)
                     if (task == taskTypes[3]) {
                         stopAlarmSound()
-                        (context as? Activity)?.finish()
-                        //alarmViewModel.onAlarmDismissed(context)
+                        //(context as? Activity)?.finish()
+                        alarmViewModel.onAlarmDismissed(context)
                     } else {
                         when (task) {
                             taskTypes[0] -> navController.navigate(
@@ -136,8 +152,8 @@ fun AlarmDisplay(
                                 TasksScreen.PhoneShaking.name
                             )
                             else -> {
-                                //alarmViewModel.onAlarmDismissed(context)
-                                (context as? Activity)?.finish()
+                                alarmViewModel.onAlarmDismissed(context)
+                                //(context as? Activity)?.finish()
                             }
                         }
                     }
@@ -166,26 +182,29 @@ fun AlarmDisplay(
                                 difficulty = difficulty,
                                 sound = sound,
                                 snooze = snooze
-                            )
+                            ),
+                            isSnoozed = isSnoozed
                         )
                         if (alarm != null) alarmDatabaseViewModel.updateAlarm(alarm!!)
-                        val snoozeMinute = Calendar.getInstance().get(Calendar.MINUTE) + 5
-                        val snoozeAlarm = alarmViewModel.setAlarm(
+                        Log.d("debug snooze:", "You snooze you lose!")
+                        alarmViewModel.setAlarm(
                             updatedAlarm(
                                 id = id,
                                 day = day,
                                 hour = hour,
-                                minute = snoozeMinute,
+                                minute = minute,
                                 task = task,
                                 roundCount = roundCount,
                                 difficulty = difficulty,
                                 sound = sound,
                                 snooze = snooze
                             ),
+                            reset = false,
                             snoozed = true
                         )
                         Toast.makeText(context, "Alarm snoozed for 5 minutes", Toast.LENGTH_LONG).show()
-                        (context as? Activity)?.finish()
+                        alarmViewModel.onAlarmDismissed(context)
+                              //(context as? Activity)?.finish()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -224,7 +243,8 @@ fun resetAlarm(
             difficulty = difficulty,
             sound = sound,
             snooze = snooze
-        )
+        ),
+        isSnoozed = isSnoozed
     )
     if (enabled) {
         alarmViewModel.setAlarm(
@@ -240,7 +260,7 @@ fun resetAlarm(
                 snooze = snooze
             ),
             reset = true,
-            snoozed = isSnoozed
+            snoozed = false
         )
     }
 }

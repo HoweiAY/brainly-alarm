@@ -46,7 +46,8 @@ class AlarmViewModel(private val context: Context): ViewModel() {
             intent.putExtra("isSnoozed", snoozed)
             intent.putExtra("alarmTriggered", true)
 
-            val requestCode = getPendingIntentRequestCode(alarmId, dayOfWeek)
+            var requestCode = getPendingIntentRequestCode(alarmId, dayOfWeek)
+            if (snoozed) requestCode = 0
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
                 requestCode,
@@ -56,20 +57,22 @@ class AlarmViewModel(private val context: Context): ViewModel() {
 
             var alarmTimeInMillis = calendar.timeInMillis
             if (reset) alarmTimeInMillis += (7 * 24 * 60 * 60 * 1000)
-            if (snoozed) alarmTimeInMillis -= (5 * 60 * 1000)
+            else if (snoozed) alarmTimeInMillis = (5 * 60 * 1000) + System.currentTimeMillis()
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTimeInMillis, pendingIntent)
 
+            Log.d("debug set alarm:", "alarm snoozed: $snoozed - $alarmId (${calendar.timeInMillis} to $alarmTimeInMillis)")
             Log.d("debug set alarm:", "alarm set: $alarmId - $requestCode")
         }
     }
 
-    fun cancelAlarm(alarm: Alarm) {
+    fun cancelAlarm(alarm: Alarm, isSnoozed: Boolean) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmId = alarm.id
         val daysOfWeek = alarm.days.map { alarm.getCalendarDay(it) }
         for (dayOfWeek in daysOfWeek) {
             val intent = Intent(context, AlarmReceiver::class.java)
-            val requestCode = getPendingIntentRequestCode(alarmId, dayOfWeek)
+            var requestCode = getPendingIntentRequestCode(alarmId, dayOfWeek)
+            if (isSnoozed) requestCode = 0
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
                 requestCode,
@@ -78,7 +81,7 @@ class AlarmViewModel(private val context: Context): ViewModel() {
             )
             alarmManager.cancel(pendingIntent)
 
-            Log.d("debug cancel alarm:", "alarm cancelled: $alarmId")
+            Log.d("debug cancel alarm:", "alarm cancelled: $alarmId - $requestCode")
         }
     }
 

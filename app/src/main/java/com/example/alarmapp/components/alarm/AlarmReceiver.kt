@@ -34,7 +34,7 @@
             val enabled = intent?.getBooleanExtra("enabled", true)
             val isSnoozed = intent?.getBooleanExtra("isSnoozed", false)
 
-            if (today == day && hour == currentHour && minute == currentMinute) {
+            if ((today == day && hour == currentHour && minute == currentMinute) || isSnoozed == true) {
                 val alarmScreenIntent = Intent(context, MainActivity::class.java)
 
                 alarmScreenIntent.putExtra("alarmId", id)

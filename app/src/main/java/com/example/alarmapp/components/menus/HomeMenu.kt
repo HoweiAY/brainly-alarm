@@ -81,7 +81,7 @@ fun HomeMenu(
     LaunchedEffect(alarmData) {
         alarmData.forEach { alarm ->
             homeViewModel.toggleAlarmEnabled(alarm, alarm.enabled)
-            if (alarm.enabled) alarmViewModel.setAlarm(alarm) else alarmViewModel.cancelAlarm(alarm)
+            if (alarm.enabled) alarmViewModel.setAlarm(alarm) else alarmViewModel.cancelAlarm(alarm, isSnoozed = false)
         }
         homeViewModel.updateNextAlarm(homeUiState.enabledAlarms)
         nextAlarmMsg = if (alarmData.isNotEmpty() && homeUiState.enabledAlarms.isNotEmpty()) homeUiState.nextAlarmMsg
@@ -182,7 +182,7 @@ fun HomeMenu(
                                                 alarm.enabled = allEnabled
                                                 alarmDatabaseViewModel.updateAlarm(alarm)
                                                 if (alarm.enabled) alarmViewModel.setAlarm(alarm)
-                                                else alarmViewModel.cancelAlarm(alarm)
+                                                else alarmViewModel.cancelAlarm(alarm, isSnoozed = false)
                                             }
                                             homeViewModel.updateNextAlarm(alarmData)
                                         }
@@ -202,7 +202,7 @@ fun HomeMenu(
                                 if (homeUiState.selectedAlarms.isNotEmpty()) {
                                     homeUiState.selectedAlarms.forEach {
                                         alarmDatabaseViewModel.deleteAlarm(it)
-                                        alarmViewModel.cancelAlarm(it)
+                                        alarmViewModel.cancelAlarm(it, isSnoozed = false)
                                     }
                                     homeViewModel.updateNextAlarm(alarmData)
                                     homeViewModel.cancelAlarmsEdit()
